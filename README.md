@@ -23,6 +23,6 @@ Define an organizational structure in a simple YAML file and visualize it in mul
 * format of the email address: <first_name>.<last_name>[number_to_make_unique]@<company_name>.<company_toplevel_domain>
 
 # Structure of the *-orgChart.yaml file
-* It contains the TEAMS and EMPLOYEES and top-level elements
+* It contains the TEAMS and EMPLOYEES top-level elements
 
 TBD
