@@ -31,9 +31,9 @@ teams:
     teams:
       OrderManagement:
         positions:
-          - title: EngineeringManager
+          - role: EngineeringManager
             occupant: priya@acme.com
-          - title: SeniorBackendEngineer     # vacant — no occupant
+          - role: SeniorBackendEngineer      # vacant — no occupant
 ```
 
 ```yaml
@@ -75,7 +75,7 @@ Each of these was decided deliberately, not overlooked:
 
 - **Reporting lines.** No manager relation is modelled. Teams nest; people do not report to
   one another. Restoring this requires settling Position identity first.
-- **Position identity.** Two same-titled seats in one Team share a Path and are
+- **Position identity.** Two Positions sharing a Role within one Team share a Path and are
   indistinguishable except by their occupant.
 - **Semantic reorganization diff.** Objective four is served by `git diff` of the YAML.
   A structural diff is foreclosed while Positions have no identity.

@@ -5,41 +5,41 @@ version: 1
 teams:
   Executive:
     positions:
-      - title: CEO
+      - role: CEO
         occupant: dana@acme.com
-      - title: CTO
+      - role: CTO
         description: Approved in the FY26 plan, search underway.
 
   retail:
     positions:
-      - title: DirectorOfRetail
+      - role: DirectorOfRetail
         occupant: miguel@acme.com
     teams:
       OrderManagement:
         positions:
-          - title: EngineeringManager
+          - role: EngineeringManager
             occupant: priya@acme.com
-          - title: SeniorBackendEngineer
+          - role: SeniorBackendEngineer
             occupant: jane@acme.com
             description: Owns the order pipeline.
-          - title: SeniorBackendEngineer
-          - title: BackendEngineer
+          - role: SeniorBackendEngineer
+          - role: BackendEngineer
             occupant: tom@acme.com
       Storefront:
         positions:
-          - title: InterimLead
+          - role: InterimLead
             occupant: priya@acme.com
             description: Held alongside the OrderManagement post until the team has its own manager.
-          - title: FrontendEngineer
+          - role: FrontendEngineer
             occupant: lars@acme.com
-          - title: UXDesigner
+          - role: UXDesigner
 
   platform:
     teams:
       Infrastructure:
         positions:
-          - title: PlatformEngineer
+          - role: PlatformEngineer
             occupant: amina@acme.com
-          - title: PlatformEngineer
+          - role: PlatformEngineer
             occupant: kwame@acme.com
       Data: {}

@@ -5,116 +5,116 @@ version: 1
 teams:
   retail:
     positions:
-      - title: ProductOwner
+      - role: ProductOwner
         occupant: samir.novak@acme.com
-      - title: Developer
-      - title: Developer
+      - role: Developer
+      - role: Developer
         occupant: noor.weber@acme.com
-      - title: DomainArchitect
+      - role: DomainArchitect
         occupant: nils.nowak@acme.com
-      - title: SystemArchitect
+      - role: SystemArchitect
         occupant: leila.petrov@acme.com
     teams:
       CheckoutCore:
         positions:
-          - title: ProductOwner
+          - role: ProductOwner
             occupant: aisha.weber@acme.com
-          - title: Developer
-          - title: Developer
+          - role: Developer
+          - role: Developer
             occupant: jane.dubois@acme.com
-          - title: DomainArchitect
+          - role: DomainArchitect
             occupant: marta.rossi@acme.com
         teams:
           NotificationCore:
             positions:
-              - title: ProductOwner
+              - role: ProductOwner
                 occupant: kwame.raman@acme.com
-              - title: Developer
+              - role: Developer
                 occupant: anja.petrov@acme.com
-              - title: Developer
+              - role: Developer
                 occupant: nils.bianchi@acme.com
           FraudPlatform:
             positions:
-              - title: ProductOwner
+              - role: ProductOwner
                 occupant: viktor.jensen@acme.com
-              - title: Developer
+              - role: Developer
                 occupant: idris.costa@acme.com
-              - title: Developer
+              - role: Developer
                 occupant: diego.dubois@acme.com
-              - title: Developer
+              - role: Developer
                 occupant: tom.ceallaigh@acme.com
-              - title: Developer
+              - role: Developer
                 occupant: miguel.kovac@acme.com
-              - title: Developer
+              - role: Developer
                 occupant: bruno.haddad@acme.com
-              - title: Developer
+              - role: Developer
                 occupant: samir.tanaka@acme.com
           FraudManagement:
             positions:
-              - title: ProductOwner
+              - role: ProductOwner
                 occupant: sofia.silva@acme.com
-              - title: Developer
+              - role: Developer
                 occupant: nils.lindqvist@acme.com
-              - title: Developer
+              - role: Developer
                 occupant: bruno.petrov@acme.com
-              - title: Developer
+              - role: Developer
                 occupant: jonas.lindqvist@acme.com
           NotificationPlatform:
             positions:
-              - title: ProductOwner
+              - role: ProductOwner
                 occupant: pedro.weber@acme.com
-              - title: Developer
+              - role: Developer
                 occupant: sofia.petrov@acme.com
-              - title: Developer
+              - role: Developer
                 occupant: mei.rossi@acme.com
-              - title: Developer
+              - role: Developer
                 occupant: elias.diallo@acme.com
-              - title: Developer
+              - role: Developer
                 occupant: chiara.jensen@acme.com
       WalletExperience:
         positions:
-          - title: ProductOwner
+          - role: ProductOwner
             occupant: tariq.jensen@acme.com
-          - title: Developer
+          - role: Developer
             occupant: hanna.kovac@acme.com
-          - title: Developer
+          - role: Developer
             occupant: elias.jensen@acme.com
       SearchCore:
         positions:
-          - title: ProductOwner
+          - role: ProductOwner
             occupant: idris.kovac@acme.com
-          - title: Developer
+          - role: Developer
             occupant: hanna.moreau@acme.com
-          - title: Developer
+          - role: Developer
             occupant: priya.haddad@acme.com
-          - title: Developer
+          - role: Developer
             occupant: priya.lindqvist@acme.com
-          - title: Developer
+          - role: Developer
             occupant: chiara.tanaka@acme.com
-          - title: Developer
+          - role: Developer
             occupant: tom.ferreira@acme.com
       SearchEngineering:
         positions:
-          - title: ProductOwner
+          - role: ProductOwner
             occupant: sofia.okafor@acme.com
-          - title: Developer
+          - role: Developer
             occupant: tariq.ceallaigh@acme.com
-          - title: Developer
+          - role: Developer
             occupant: lars.ferreira@acme.com
-          - title: Developer
+          - role: Developer
             occupant: dana.ferreira@acme.com
       ShippingCore:
         positions:
-          - title: ProductOwner
+          - role: ProductOwner
             occupant: samir.raman@acme.com
-          - title: Developer
+          - role: Developer
             occupant: sofia.jensen@acme.com
-          - title: Developer
+          - role: Developer
             occupant: omar.haq@acme.com
-          - title: Developer
-          - title: Developer
+          - role: Developer
+          - role: Developer
             occupant: priya.mensah@acme.com
-          - title: Developer
+          - role: Developer
             occupant: chiara.berg@acme.com
-          - title: Developer
+          - role: Developer
             occupant: idris.silva@acme.com

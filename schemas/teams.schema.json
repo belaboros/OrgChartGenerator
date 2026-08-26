@@ -41,14 +41,14 @@
     "position": {
       "type": "object",
       "description": "A single seat within a Team. Vacant when 'occupant' is absent.",
-      "required": ["title"],
+      "required": ["role"],
       "additionalProperties": false,
       "properties": {
-        "title": {
+        "role": {
           "type": "string",
           "minLength": 1,
           "pattern": "^[^/]+$",
-          "description": "Job title. May not contain '/'. Need not be unique within a Team."
+          "description": "The Role this Position is a seat for, e.g. 'EngineeringManager'. May not contain '/'. Need not be unique within a Team."
         },
         "occupant": {
           "type": "string",
