@@ -7,3 +7,6 @@ dist/
 
 # Throwaway git worktrees created by background agents
 .claude/worktrees/
+
+# temporary prototypes
+prototypes
