@@ -1,2 +1,9 @@
 # Local Python environment created by ./scripts/validate.sh --setup
 .venv/
+
+# Node dependencies and build output (app/, prototypes/)
+node_modules/
+dist/
+
+# Throwaway git worktrees created by background agents
+.claude/worktrees/

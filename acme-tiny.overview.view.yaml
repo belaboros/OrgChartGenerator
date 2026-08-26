@@ -1,0 +1,22 @@
+org: ACME
+version: 1
+encoding: enclosure
+arrangement:
+  default: fit
+detail:
+  positions: true
+  occupantNames: true
+  counts: false
+style:
+  org: {border: 3, font: 17, fill: "#fafafa"}
+  teamDepth: {"1": {border: 2, font: 15, fill: "#f1f6ff"}, "2": {border: 1, font: 13, fill: "#ffffff"}, "3": {border: 1, font: 12, fill: "#fcfcfd"}}
+  vacant: {fill: "#ffe4e4", text: "#b02020"}
+geometry:
+  ACME: {x: 0, y: 0, w: 692, h: 405}
+  ACME/Executive: {x: 10, y: 34, w: 146, h: 74}
+  ACME/platform: {x: 10, y: 213, w: 258, h: 178}
+  ACME/platform/Data: {x: 20, y: 333, w: 140, h: 44}
+  ACME/platform/Infrastructure: {x: 20, y: 247, w: 238, h: 74}
+  ACME/retail: {x: 168, y: 34, w: 515, h: 167}
+  ACME/retail/OrderManagement: {x: 178, y: 83, w: 245, h: 104}
+  ACME/retail/Storefront: {x: 434, y: 83, w: 238, h: 89}

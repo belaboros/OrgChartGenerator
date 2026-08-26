@@ -1,0 +1,45 @@
+org: ACME-medium
+version: 1
+encoding: enclosure
+arrangement:
+  default: fit
+detail:
+  positions: true
+  occupantNames: true
+  counts: false
+style:
+  org: {border: 3, font: 17, fill: "#fafafa"}
+  teamDepth: {"1": {border: 2, font: 15, fill: "#f1f6ff"}, "2": {border: 1, font: 13, fill: "#ffffff"}, "3": {border: 1, font: 12, fill: "#fcfcfd"}}
+  vacant: {fill: "#ffe4e4", text: "#b02020"}
+geometry:
+  ACME-medium: {x: 0, y: 0, w: 1884, h: 1412}
+  ACME-medium/logistics: {x: 10, y: 849, w: 449, h: 549}
+  ACME-medium/logistics/ComplianceSystems: {x: 237, y: 1119, w: 205, h: 119}
+  ACME-medium/logistics/InventoryExperience: {x: 237, y: 958, w: 212, h: 119}
+  ACME-medium/logistics/MessagingOperations: {x: 20, y: 1119, w: 205, h: 119}
+  ACME-medium/logistics/ReturnsManagement: {x: 20, y: 1250, w: 205, h: 134}
+  ACME-medium/logistics/ShippingPlatform: {x: 20, y: 958, w: 205, h: 149}
+  ACME-medium/platform: {x: 1438, y: 34, w: 435, h: 448}
+  ACME-medium/platform/ForecastingCore: {x: 1448, y: 334, w: 192, h: 134}
+  ACME-medium/platform/MessagingCore: {x: 1448, y: 188, w: 218, h: 134}
+  ACME-medium/platform/SubscriptionOperations: {x: 1652, y: 334, w: 212, h: 89}
+  ACME-medium/retail: {x: 10, y: 34, w: 1416, h: 803}
+  ACME-medium/retail/AnalyticsExperience: {x: 954, y: 143, w: 462, h: 549}
+  ACME-medium/retail/AnalyticsExperience/OrderManagement: {x: 964, y: 252, w: 212, h: 89}
+  ACME-medium/retail/AnalyticsExperience/PaymentServices: {x: 964, y: 398, w: 212, h: 89}
+  ACME-medium/retail/AnalyticsExperience/SettlementPlatform: {x: 1188, y: 398, w: 218, h: 119}
+  ACME-medium/retail/AnalyticsExperience/TaxCore: {x: 1188, y: 252, w: 218, h: 134}
+  ACME-medium/retail/AnalyticsExperience/WarehouseOperations: {x: 964, y: 529, w: 198, h: 149}
+  ACME-medium/retail/CheckoutEngineering: {x: 20, y: 704, w: 225, h: 119}
+  ACME-medium/retail/ReportingServices: {x: 257, y: 704, w: 205, h: 89}
+  ACME-medium/retail/SettlementEngineering: {x: 20, y: 143, w: 462, h: 403}
+  ACME-medium/retail/SettlementEngineering/ComplianceEngineering: {x: 30, y: 252, w: 185, h: 89}
+  ACME-medium/retail/SettlementEngineering/InventoryEngineering: {x: 30, y: 413, w: 225, h: 119}
+  ACME-medium/retail/SettlementEngineering/NotificationCore: {x: 267, y: 413, w: 205, h: 104}
+  ACME-medium/retail/SettlementEngineering/ShippingServices: {x: 227, y: 252, w: 218, h: 149}
+  ACME-medium/retail/SupplierOperations: {x: 494, y: 143, w: 449, h: 534}
+  ACME-medium/retail/SupplierOperations/CatalogExperience: {x: 504, y: 398, w: 205, h: 119}
+  ACME-medium/retail/SupplierOperations/CheckoutPlatform: {x: 721, y: 237, w: 205, h: 149}
+  ACME-medium/retail/SupplierOperations/ContentEngineering: {x: 504, y: 237, w: 205, h: 104}
+  ACME-medium/retail/SupplierOperations/OnboardingEngineering: {x: 504, y: 529, w: 218, h: 134}
+  ACME-medium/retail/SupplierOperations/PricingEngineering: {x: 721, y: 398, w: 212, h: 104}

@@ -1,0 +1,14 @@
+node_modules/
+dist/
+
+# One-off verification scripts and their output. These produced the numbers in the
+# ticket resolutions (#25-#31), but they are pinned to a fixed port and the dev
+# file adapter, so they would rot rather than serve as a test suite. The numbers
+# live on the issues; when "how a visual tool gets tested" is settled, a real
+# suite replaces these.
+verify*.mjs
+time*.mjs
+shot*.mjs
+*.png
+!public/*.png
+sample.view.yaml

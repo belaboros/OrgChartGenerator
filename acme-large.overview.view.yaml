@@ -1,0 +1,115 @@
+org: ACME-large
+version: 1
+encoding: enclosure
+arrangement:
+  default: fit
+detail:
+  positions: false
+  occupantNames: true
+  counts: true
+style:
+  org: {border: 3, font: 17, fill: "#fafafa"}
+  teamDepth: {"1": {border: 2, font: 15, fill: "#f1f6ff"}, "2": {border: 1, font: 13, fill: "#ffffff"}, "3": {border: 1, font: 12, fill: "#fcfcfd"}}
+  vacant: {fill: "#ffe4e4", text: "#b02020"}
+geometry:
+  ACME-large: {x: 0, y: 0, w: 2046, h: 1423}
+  ACME-large/customer: {x: 1442, y: 806, w: 594, h: 603}
+  ACME-large/customer/BillingOperations: {x: 1452, y: 855, w: 372, h: 193}
+  ACME-large/customer/BillingOperations/ContentServices: {x: 1462, y: 975, w: 170, h: 59}
+  ACME-large/customer/BillingOperations/IdentityOperations: {x: 1644, y: 975, w: 170, h: 59}
+  ACME-large/customer/BillingOperations/PaymentExperience: {x: 1644, y: 904, w: 170, h: 59}
+  ACME-large/customer/BillingOperations/PricingServices: {x: 1462, y: 904, w: 170, h: 59}
+  ACME-large/customer/ReturnsEngineering: {x: 1836, y: 855, w: 190, h: 264}
+  ACME-large/customer/ReturnsEngineering/ForecastingCore: {x: 1846, y: 975, w: 170, h: 59}
+  ACME-large/customer/ReturnsEngineering/OrderCore: {x: 1846, y: 1046, w: 170, h: 59}
+  ACME-large/customer/ReturnsEngineering/WalletEngineering: {x: 1846, y: 904, w: 170, h: 59}
+  ACME-large/customer/SearchPlatform: {x: 1452, y: 1131, w: 190, h: 264}
+  ACME-large/customer/SearchPlatform/CheckoutPlatform: {x: 1462, y: 1180, w: 170, h: 59}
+  ACME-large/customer/SearchPlatform/LoyaltyExperience: {x: 1462, y: 1322, w: 170, h: 59}
+  ACME-large/customer/SearchPlatform/ReturnsCore: {x: 1462, y: 1251, w: 170, h: 59}
+  ACME-large/customer/SearchSystems: {x: 1654, y: 1131, w: 170, h: 59}
+  ACME-large/finance: {x: 836, y: 806, w: 594, h: 603}
+  ACME-large/finance/OnboardingExperience: {x: 846, y: 855, w: 190, h: 264}
+  ACME-large/finance/OnboardingExperience/CompliancePlatform: {x: 856, y: 975, w: 170, h: 59}
+  ACME-large/finance/OnboardingExperience/PaymentPlatform: {x: 856, y: 1046, w: 170, h: 59}
+  ACME-large/finance/OnboardingExperience/ReturnsSystems: {x: 856, y: 904, w: 170, h: 59}
+  ACME-large/finance/OnboardingSystems: {x: 846, y: 1131, w: 190, h: 264}
+  ACME-large/finance/OnboardingSystems/LoyaltyPlatform: {x: 856, y: 1180, w: 170, h: 59}
+  ACME-large/finance/OnboardingSystems/LoyaltyServices: {x: 856, y: 1322, w: 170, h: 59}
+  ACME-large/finance/OnboardingSystems/PaymentServices: {x: 856, y: 1251, w: 170, h: 59}
+  ACME-large/finance/PaymentCore: {x: 1048, y: 855, w: 372, h: 193}
+  ACME-large/finance/PaymentCore/IdentityManagement: {x: 1240, y: 904, w: 170, h: 59}
+  ACME-large/finance/PaymentCore/IdentityPlatform: {x: 1058, y: 975, w: 170, h: 59}
+  ACME-large/finance/PaymentCore/PaymentSystems: {x: 1240, y: 975, w: 170, h: 59}
+  ACME-large/finance/PaymentCore/ReportingExperience: {x: 1058, y: 904, w: 170, h: 59}
+  ACME-large/logistics: {x: 10, y: 806, w: 814, h: 603}
+  ACME-large/logistics/ComplianceExperience: {x: 638, y: 1131, w: 176, h: 59}
+  ACME-large/logistics/PricingManagement: {x: 254, y: 1131, w: 372, h: 264}
+  ACME-large/logistics/PricingManagement/CheckoutExperience: {x: 264, y: 1322, w: 170, h: 59}
+  ACME-large/logistics/PricingManagement/ForecastingSystems: {x: 446, y: 1322, w: 170, h: 59}
+  ACME-large/logistics/PricingManagement/OnboardingServices: {x: 264, y: 1180, w: 170, h: 59}
+  ACME-large/logistics/PricingManagement/SubscriptionExperience: {x: 264, y: 1251, w: 189, h: 59}
+  ACME-large/logistics/RoutingCore: {x: 20, y: 1131, w: 222, h: 264}
+  ACME-large/logistics/RoutingCore/CatalogExperience: {x: 30, y: 1322, w: 170, h: 59}
+  ACME-large/logistics/RoutingCore/RecommendationExperience: {x: 30, y: 1180, w: 202, h: 59}
+  ACME-large/logistics/RoutingCore/RoutingServices: {x: 30, y: 1251, w: 170, h: 59}
+  ACME-large/logistics/ShippingEngineering: {x: 20, y: 855, w: 372, h: 193}
+  ACME-large/logistics/ShippingEngineering/CheckoutServices: {x: 212, y: 975, w: 170, h: 59}
+  ACME-large/logistics/ShippingEngineering/FraudManagement: {x: 212, y: 904, w: 170, h: 59}
+  ACME-large/logistics/ShippingEngineering/PricingOperations: {x: 30, y: 904, w: 170, h: 59}
+  ACME-large/logistics/ShippingEngineering/ReportingCore: {x: 30, y: 975, w: 170, h: 59}
+  ACME-large/logistics/WalletOperations: {x: 404, y: 855, w: 196, h: 264}
+  ACME-large/logistics/WalletOperations/NotificationServices: {x: 414, y: 1046, w: 176, h: 59}
+  ACME-large/logistics/WalletOperations/ReportingPlatform: {x: 414, y: 975, w: 170, h: 59}
+  ACME-large/logistics/WalletOperations/SearchServices: {x: 414, y: 904, w: 170, h: 59}
+  ACME-large/platform: {x: 798, y: 49, w: 1160, h: 745}
+  ACME-large/platform/MediaExperience: {x: 1576, y: 98, w: 372, h: 264}
+  ACME-large/platform/MediaExperience/CheckoutCore: {x: 1768, y: 147, w: 170, h: 59}
+  ACME-large/platform/MediaExperience/ContentSystems: {x: 1768, y: 218, w: 170, h: 59}
+  ACME-large/platform/MediaExperience/OrderOperations: {x: 1586, y: 289, w: 170, h: 59}
+  ACME-large/platform/MediaExperience/WalletExperience: {x: 1586, y: 218, w: 170, h: 59}
+  ACME-large/platform/MediaExperience/WarehouseOperations: {x: 1586, y: 147, w: 170, h: 59}
+  ACME-large/platform/MessagingEngineering: {x: 808, y: 98, w: 372, h: 335}
+  ACME-large/platform/MessagingEngineering/CatalogCore: {x: 818, y: 218, w: 170, h: 59}
+  ACME-large/platform/MessagingEngineering/OnboardingManagement: {x: 818, y: 147, w: 176, h: 59}
+  ACME-large/platform/MessagingEngineering/PricingSystems: {x: 818, y: 360, w: 170, h: 59}
+  ACME-large/platform/MessagingEngineering/RoutingEngineering: {x: 1000, y: 360, w: 170, h: 59}
+  ACME-large/platform/MessagingEngineering/SettlementManagement: {x: 818, y: 289, w: 176, h: 59}
+  ACME-large/platform/OnboardingCore: {x: 1192, y: 445, w: 372, h: 335}
+  ACME-large/platform/OnboardingCore/NotificationCore: {x: 1202, y: 707, w: 170, h: 59}
+  ACME-large/platform/OnboardingCore/OnboardingOperations: {x: 1202, y: 494, w: 176, h: 59}
+  ACME-large/platform/OnboardingCore/PricingExperience: {x: 1202, y: 565, w: 170, h: 59}
+  ACME-large/platform/OnboardingCore/ReturnsOperations: {x: 1384, y: 707, w: 170, h: 59}
+  ACME-large/platform/OnboardingCore/SettlementOperations: {x: 1202, y: 636, w: 176, h: 59}
+  ACME-large/platform/SearchManagement: {x: 1192, y: 98, w: 372, h: 264}
+  ACME-large/platform/SearchManagement/BillingServices: {x: 1202, y: 289, w: 170, h: 59}
+  ACME-large/platform/SearchManagement/ComplianceManagement: {x: 1202, y: 218, w: 176, h: 59}
+  ACME-large/platform/SearchManagement/FraudSystems: {x: 1384, y: 289, w: 170, h: 59}
+  ACME-large/platform/SearchManagement/InventoryManagement: {x: 1202, y: 147, w: 170, h: 59}
+  ACME-large/platform/ShippingCore: {x: 808, y: 445, w: 372, h: 264}
+  ACME-large/platform/ShippingCore/MessagingExperience: {x: 818, y: 565, w: 170, h: 59}
+  ACME-large/platform/ShippingCore/NotificationExperience: {x: 818, y: 494, w: 189, h: 59}
+  ACME-large/platform/ShippingCore/OrderSystems: {x: 1000, y: 565, w: 170, h: 59}
+  ACME-large/platform/ShippingCore/ShippingExperience: {x: 818, y: 636, w: 170, h: 59}
+  ACME-large/retail: {x: 10, y: 49, w: 776, h: 674}
+  ACME-large/retail/AnalyticsEngineering: {x: 20, y: 650, w: 176, h: 59}
+  ACME-large/retail/InventoryOperations: {x: 404, y: 374, w: 372, h: 264}
+  ACME-large/retail/InventoryOperations/FraudEngineering: {x: 414, y: 565, w: 170, h: 59}
+  ACME-large/retail/InventoryOperations/OrderEngineering: {x: 596, y: 423, w: 170, h: 59}
+  ACME-large/retail/InventoryOperations/ReturnsExperience: {x: 414, y: 423, w: 170, h: 59}
+  ACME-large/retail/InventoryOperations/SettlementEngineering: {x: 414, y: 494, w: 183, h: 59}
+  ACME-large/retail/LoyaltyCore: {x: 20, y: 98, w: 372, h: 264}
+  ACME-large/retail/LoyaltyCore/ContentEngineering: {x: 30, y: 218, w: 170, h: 59}
+  ACME-large/retail/LoyaltyCore/IdentityExperience: {x: 212, y: 147, w: 170, h: 59}
+  ACME-large/retail/LoyaltyCore/IdentityServices: {x: 212, y: 218, w: 170, h: 59}
+  ACME-large/retail/LoyaltyCore/MessagingOperations: {x: 30, y: 289, w: 170, h: 59}
+  ACME-large/retail/LoyaltyCore/ReportingOperations: {x: 30, y: 147, w: 170, h: 59}
+  ACME-large/retail/MediaCore: {x: 404, y: 98, w: 190, h: 264}
+  ACME-large/retail/MediaCore/BillingSystems: {x: 414, y: 218, w: 170, h: 59}
+  ACME-large/retail/MediaCore/SupplierPlatform: {x: 414, y: 289, w: 170, h: 59}
+  ACME-large/retail/MediaCore/TaxServices: {x: 414, y: 147, w: 170, h: 59}
+  ACME-large/retail/TaxExperience: {x: 20, y: 374, w: 372, h: 264}
+  ACME-large/retail/TaxExperience/NotificationEngineering: {x: 30, y: 494, w: 196, h: 59}
+  ACME-large/retail/TaxExperience/NotificationSystems: {x: 30, y: 565, w: 170, h: 59}
+  ACME-large/retail/TaxExperience/WalletManagement: {x: 30, y: 423, w: 170, h: 59}
+  ACME-large/retail/TaxExperience/WalletServices: {x: 212, y: 565, w: 170, h: 59}

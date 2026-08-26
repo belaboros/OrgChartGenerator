@@ -1,0 +1,430 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import yaml from 'js-yaml'
+import type { Arrangement, Encoding, ShapeKind } from './files/types'
+import type { Organization } from './model/types'
+import type { Files } from './files/types'
+import { layout } from './view/layout'
+import type { ArrangementCascade } from './view/layout'
+import type { DetailSwitches } from './view/layout'
+import { Canvas } from './view/Canvas'
+import { Inspector } from './ui/Inspector'
+import { renderSvgToPng, ExportTooLarge } from './view/png'
+import { parseViewDoc, serialise, toViewDoc, viewFileName, viewNameOf, ViewFileError } from './view/viewFile'
+import type { CanvasHandle } from './view/Canvas'
+import { DEFAULT_STYLE, writeLayer } from './view/cascade'
+import type { StyleDoc } from './view/cascade'
+import { useFps } from './useFps'
+
+/**
+ * #25 renders. The control surface is the Inspector rail chosen in #22 and built
+ * in #27; detail switches and the Role filter are #27 too. What is here is the
+ * minimum needed to show both encodings, both shapes, and the cascade working.
+ */
+const ENCODINGS = ['enclosure', 'node-link'] as const satisfies readonly Encoding[]
+const SHAPES = ['rectangle', 'circle'] as const satisfies readonly ShapeKind[]
+const ARRANGEMENTS = [
+  'fit',
+  'left-to-right',
+  'top-to-bottom',
+  'radial',
+  'grid-2x2',
+  'grid-3x3',
+  'grid-4x3',
+] as const satisfies readonly Arrangement[]
+
+export function Workbench({ org, files, onClose }: { org: Organization; files: Files; onClose(): void }) {
+  const [encoding, setEncoding] = useState<Encoding>('enclosure')
+  const [arrangement, setArrangement] = useState<ArrangementCascade>({ default: 'fit' })
+  const [aspect, setAspect] = useState(1.6)
+  /**
+   * Geometry the user has placed by hand. Empty here — #28 fills it. It exists now
+   * because arrange's contract is defined against it: pressing arrange DISCARDS
+   * these, so anything that recomputes layout has to go through the same door.
+   */
+  const [manual, setManual] = useState<Record<string, { x: number; y: number; w: number; h: number }>>({})
+  const wrapRef = useRef<HTMLDivElement>(null)
+  const [style, setStyle] = useState<StyleDoc>(DEFAULT_STYLE)
+  const [selected, setSelected] = useState<string | null>(null)
+  const [interacting, setInteracting] = useState(false)
+  const canvas = useRef<CanvasHandle>(null)
+  const { fps, worst } = useFps(interacting)
+
+  const [detail, setDetail] = useState<DetailSwitches>({ positions: true, occupantNames: true, counts: false })
+  const [filter, setFilter] = useState<ReadonlySet<string>>(new Set())
+  const [railCollapsed, setRailCollapsed] = useState(false)
+  const [exportNote, setExportNote] = useState('')
+  const [exporting, setExporting] = useState(false)
+  const [views, setViews] = useState<string[]>([])
+  const [viewNote, setViewNote] = useState('')
+
+  const { placement, layoutMs } = useMemo(() => {
+    const t0 = performance.now()
+    const p = layout(org, { encoding, detail, roleFilter: filter, arrangement, targetAspect: aspect })
+    return { placement: p, layoutMs: performance.now() - t0 }
+  }, [org, encoding, arrangement, aspect, detail, filter])
+
+  // Only `fit` consults the window, but it consults it continuously.
+  useEffect(() => {
+    const el = wrapRef.current
+    if (!el) return
+    const measure = (): void => setAspect(el.clientWidth / Math.max(1, el.clientHeight))
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    measure()
+    return () => ro.disconnect()
+  }, [])
+
+  const manualCount = Object.keys(manual).length
+
+  /**
+   * Arrange is a command. Anything that recomputes the whole layout — pressing the
+   * button, switching encoding, changing an arrangement — is the same command, and
+   * therefore discards hand-placed geometry. Routing all of them through one door
+   * is what stops a dropdown from quietly destroying work a button warns about.
+   */
+  const arrange = useCallback(
+    (change?: () => void): void => {
+      if (manualCount > 0) {
+        const ok = window.confirm(
+          `Arrange recomputes every shape and discards ${manualCount} hand-placed ` +
+            `position${manualCount === 1 ? '' : 's'}. Continue?`,
+        )
+        if (!ok) return
+      }
+      setManual({})
+      change?.()
+    },
+    [manualCount],
+  )
+
+  /*
+   * The line between what discards hand-placed geometry and what does not is drawn
+   * at WHAT THE CONTROL IS ABOUT, not at whether it happens to change box sizes.
+   *
+   *   Placement controls — encoding, arrangement, the Arrange button — exist to
+   *   decide where shapes go, so keeping hand placement through them is meaningless.
+   *   They discard, and confirm first.
+   *
+   *   Content controls — detail switches, the Role filter, styling — do not ask for
+   *   a new placement. Hand-placed shapes keep the position and size they were
+   *   given; only their contents change.
+   *
+   * (This revises #27, which routed detail and filter through arrange(). #28's
+   * done-condition is the better rule and this is the line that satisfies it.)
+   */
+  const toggleDetail = useCallback(
+    (k: keyof DetailSwitches) => setDetail((d) => ({ ...d, [k]: !d[k] })),
+    [],
+  )
+  const changeFilter = useCallback((next: Set<string>) => setFilter(next), [])
+  const manualPaths = useMemo(() => new Set(Object.keys(manual)), [manual])
+
+  /** Moving a Team moves its whole subtree — a child cannot leave its parent. */
+  const onMove = useCallback(
+    (path: string, dx: number, dy: number) => {
+      setManual((prev) => {
+        const next = { ...prev }
+        for (const n of placement.nodes) {
+          if (n.path !== path && !n.path.startsWith(path + '/')) continue
+          const cur = next[n.path] ?? { x: n.x, y: n.y, w: n.w, h: n.h }
+          next[n.path] = { ...cur, x: cur.x + dx, y: cur.y + dy }
+        }
+        return next
+      })
+    },
+    [placement],
+  )
+
+  /** Resizing affects only the Team resized; its children keep their own geometry. */
+  const onResize = useCallback(
+    (path: string, w: number, h: number) => {
+      setManual((prev) => {
+        const n = placement.nodes.find((m) => m.path === path)
+        if (!n) return prev
+        const cur = prev[path] ?? { x: n.x, y: n.y, w: n.w, h: n.h }
+        return { ...prev, [path]: { ...cur, w, h } }
+      })
+    },
+    [placement],
+  )
+
+  useEffect(() => {
+    void files.listViews(org.prefix).then(setViews)
+  }, [files, org.prefix])
+
+  const loadView = useCallback(
+    async (file: string) => {
+      try {
+        const doc = parseViewDoc(await files.loadView(file))
+        // The binding to the organization is recorded, not enforced (#6 Q7, #18).
+        const mismatch = doc.org !== org.name ? ` (saved against "${doc.org}", not "${org.name}")` : ''
+        setEncoding(doc.encoding)
+        setArrangement(doc.arrangement)
+        setDetail(doc.detail)
+        setFilter(new Set(doc.filter?.roles ?? []))
+        setStyle(doc.style)
+        setManual(doc.geometry)
+        setSelected(null)
+        setViewNote(`Loaded ${viewNameOf(org.prefix, file)}${mismatch}`)
+      } catch (e) {
+        setViewNote(
+          e instanceof ViewFileError ? `${file} is not a valid view — ${e.message}` :
+          `Could not open ${file}: ${e instanceof Error ? e.message : String(e)}`,
+        )
+      }
+    },
+    [files, org.name, org.prefix],
+  )
+
+  const patchLayer = useCallback(
+    (id: string, patch: Record<string, unknown>) => setStyle((prev) => writeLayer(prev, id, patch)),
+    [],
+  )
+
+  const depths = useMemo(
+    () => [...new Set(placement.nodes.map((n) => n.depth))].filter((d) => d > 0).sort((a, b) => a - b),
+    [placement],
+  )
+
+  const shape: ShapeKind = style.team?.shape ?? 'rectangle'
+  const setShape = useCallback(
+    (s: ShapeKind) => setStyle((prev) => ({ ...prev, team: { ...prev.team, shape: s } })),
+    [],
+  )
+
+  const placementWithManual = useMemo(() => {
+    if (manualCount === 0) return placement
+    const nodes = placement.nodes.map((n) => (manual[n.path] ? { ...n, ...manual[n.path]! } : n))
+    return {
+      nodes,
+      width: Math.max(...nodes.map((n) => n.x + n.w)) + 20,
+      height: Math.max(...nodes.map((n) => n.y + n.h)) + 20,
+    }
+  }, [placement, manual, manualCount])
+
+  // Handles for headless verification; harmless in production.
+  useEffect(() => {
+    const w = window as unknown as Record<string, unknown>
+    w['__placement'] = placementWithManual
+    w['__serialiseView'] = (): string => {
+      const geometry: Record<string, { x: number; y: number; w: number; h: number }> = {}
+      for (const n of placementWithManual.nodes) geometry[n.path] = { x: n.x, y: n.y, w: n.w, h: n.h }
+      return serialise(toViewDoc(org.name, { encoding, arrangement, detail, filter, style, geometry }))
+    }
+    w['__loadViewText'] = (text: string): string => {
+      try {
+        const doc = parseViewDoc(yaml.load(text))
+        setEncoding(doc.encoding)
+        setArrangement(doc.arrangement)
+        setDetail(doc.detail)
+        setFilter(new Set(doc.filter?.roles ?? []))
+        setStyle(doc.style)
+        setManual(doc.geometry)
+        return 'ok'
+      } catch (e) {
+        return e instanceof Error ? e.message : String(e)
+      }
+    }
+  }, [placementWithManual, org.name, encoding, arrangement, detail, filter, style])
+
+  /**
+   * Export goes through the file seam, not a bare download link — and it reports
+   * the dimensions it actually produced, because silent truncation is the specific
+   * defect this feature exists to avoid (#19 measured `toDataURL` returning an
+   * empty `data:,` past the canvas cap, with no error at all).
+   */
+  const exportPng = useCallback(
+    async (scale: number) => {
+      const svg = canvas.current?.element()
+      if (!svg) return
+      setExporting(true)
+      setExportNote(`Rendering at ${scale}×…`)
+      const started = performance.now()
+      try {
+        const r = await renderSvgToPng(svg, placementWithManual.width, placementWithManual.height, scale)
+        await files.exportPng(r.blob, `${org.prefix}-${encoding}-${arrangement.default}@${scale}x.png`)
+        setExportNote(
+          `Exported ${r.width}×${r.height} from ${r.tiles} tile${r.tiles === 1 ? '' : 's'}, ` +
+            `${(r.blob.size / 1e6).toFixed(1)} MB, ${Math.round(performance.now() - started)} ms`,
+        )
+      } catch (e) {
+        if (e instanceof DOMException && e.name === 'AbortError') {
+          setExportNote('')
+        } else {
+          setExportNote(
+            e instanceof ExportTooLarge || e instanceof Error
+              ? `Export failed: ${e.message}`
+              : 'Export failed.',
+          )
+        }
+      } finally {
+        setExporting(false)
+      }
+    },
+    [files, org.prefix, encoding, arrangement.default, placementWithManual],
+  )
+
+  /**
+   * Geometry is authoritative — it is what gets drawn. `arrangement` only records
+   * what the arrange command would apply NEXT, which is why a view saved under
+   * `fit` in one window still opens as it was saved in another (#18).
+   */
+  const saveView = useCallback(
+    async (name: string) => {
+      const geometry: Record<string, { x: number; y: number; w: number; h: number }> = {}
+      for (const n of placementWithManual.nodes) geometry[n.path] = { x: n.x, y: n.y, w: n.w, h: n.h }
+      const doc = toViewDoc(org.name, { encoding, arrangement, detail, filter, style, geometry })
+      const file = viewFileName(org.prefix, name)
+      try {
+        await files.saveView(file, doc)
+        setViews(await files.listViews(org.prefix))
+        setViewNote(`Saved ${file} — ${Object.keys(geometry).length} shapes`)
+      } catch (e) {
+        setViewNote(`Save failed: ${e instanceof Error ? e.message : String(e)}`)
+      }
+    },
+    [files, org.name, org.prefix, encoding, arrangement, detail, filter, style, placementWithManual],
+  )
+
+  const labelCount = placement.nodes.reduce((a, n) => a + n.positions.length, 0)
+  const sel = selected ? placementWithManual.nodes.find((n) => n.path === selected) ?? null : null
+
+  return (
+    <div style={S.page} onPointerDown={() => setInteracting(true)} onPointerUp={() => setInteracting(false)}>
+      <div style={S.top}>
+        <button style={S.ghost} onClick={onClose}>← Organizations</button>
+        <b>{org.prefix}</b>
+        <Seg value={encoding} opts={ENCODINGS} onChange={(v) => arrange(() => setEncoding(v))} />
+        <select
+          value={arrangement.default}
+          onChange={(e) => {
+            const v = e.target.value as Arrangement
+            arrange(() => setArrangement({ default: v }))
+          }}
+          style={S.select}
+        >
+          {ARRANGEMENTS.map((a) => (
+            <option key={a}>{a}</option>
+          ))}
+        </select>
+        <button style={S.primary} onClick={() => arrange()}>
+          Arrange{manualCount ? ` · discards ${manualCount}` : ''}
+        </button>
+        <Seg value={shape} opts={SHAPES} onChange={(v) => setShape(v)} />
+        <button style={S.ghost} onClick={() => canvas.current?.fit()}>Fit</button>
+        <select
+          value=""
+          onChange={(e) => { if (e.target.value) void loadView(e.target.value) }}
+          style={S.select}
+          title="Open a saved view"
+        >
+          <option value="">{views.length ? `Open view (${views.length})…` : 'No saved views'}</option>
+          {views.map((v) => (
+            <option key={v} value={v}>{viewNameOf(org.prefix, v)}</option>
+          ))}
+        </select>
+        <button
+          style={S.ghost}
+          onClick={() => {
+            const name = window.prompt('Name this view', 'compact')
+            if (name) void saveView(name.replace(/[^A-Za-z0-9._-]/g, '-'))
+          }}
+        >
+          Save view
+        </button>
+        <span style={S.exportGroup}>
+          <span style={S.dim}>PNG</span>
+          {[1, 2, 4].map((s2) => (
+            <button key={s2} style={S.ghost} disabled={exporting} onClick={() => void exportPng(s2)}>
+              {s2}×
+            </button>
+          ))}
+        </span>
+        <span style={{ flex: 1 }} />
+        <span style={{ ...S.dim, color: /failed|not a valid/i.test(exportNote + viewNote) ? 'var(--bad)' : 'var(--ink-2)' }} data-k="export">
+          {exportNote || viewNote}
+        </span>
+      </div>
+
+      <div style={S.metrics} id="metrics">
+        <span data-k="shapes">{placementWithManual.nodes.length} shapes</span>
+        <span data-k="labels">{labelCount} labels</span>
+        <span data-k="size">{Math.round(placementWithManual.width)}×{Math.round(placementWithManual.height)}</span>
+        <span data-k="ratio">
+          ratio {(placementWithManual.width / placementWithManual.height).toFixed(2)} / window {aspect.toFixed(2)}
+        </span>
+        <span data-k="layout">layout {layoutMs.toFixed(1)} ms</span>
+        <span data-k="fps">fps {fps ? fps.toFixed(0) : '—'}</span>
+        <span data-k="worst">worst {Number.isFinite(worst) ? worst.toFixed(0) : '—'}</span>
+      </div>
+
+      <div style={{ ...S.body, gridTemplateColumns: railCollapsed ? '1fr 28px' : '1fr 318px' }}>
+        <div style={S.canvasWrap} ref={wrapRef}>
+          <Canvas
+            ref={canvas}
+            placement={placementWithManual}
+            style={style}
+            detail={detail}
+            selected={selected}
+            onSelect={setSelected}
+            manual={manualPaths}
+            onMove={onMove}
+            onResize={onResize}
+          />
+        </div>
+        <Inspector
+          selected={sel}
+          depths={depths}
+          roles={org.roles}
+          style={style}
+          detail={detail}
+          filter={filter}
+          onPatchLayer={patchLayer}
+          onToggleDetail={toggleDetail}
+          onFilter={changeFilter}
+          collapsed={railCollapsed}
+          onCollapse={setRailCollapsed}
+        />
+      </div>
+    </div>
+  )
+}
+
+function Seg<T extends string>({ value, opts, onChange }: { value: T; opts: readonly T[]; onChange(v: T): void }) {
+  return (
+    <span style={S.seg}>
+      {opts.map((o) => (
+        <button
+          key={o}
+          onClick={() => onChange(o)}
+          style={{ ...S.segBtn, ...(value === o ? S.segOn : null) }}
+        >
+          {o}
+        </button>
+      ))}
+    </span>
+  )
+}
+
+const S: Record<string, React.CSSProperties> = {
+  page: { display: 'grid', gridTemplateRows: 'auto auto 1fr', height: '100%' },
+  top: { display: 'flex', gap: 10, alignItems: 'center', padding: '8px 12px', background: 'var(--surface)', borderBottom: '1px solid var(--rule)', flexWrap: 'wrap' },
+  metrics: { display: 'flex', gap: 18, padding: '5px 12px', background: '#fbfcfd', borderBottom: '1px solid var(--rule)', fontSize: 12, fontVariantNumeric: 'tabular-nums', color: 'var(--ink-2)' },
+  body: { display: 'grid', minHeight: 0 },
+  canvasWrap: { position: 'relative', minWidth: 0, overflow: 'hidden' },
+  rail: { borderLeft: '1px solid var(--rule)', background: '#fbfcfd', padding: '12px 14px', overflowY: 'auto', fontSize: 12 },
+  h3: { margin: '0 0 8px', fontSize: 12, letterSpacing: '.09em', textTransform: 'uppercase', color: 'var(--ink-3)' },
+  h4: { margin: '14px 0 6px', fontSize: 11, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink-3)' },
+  railMeta: { margin: '0 0 8px', color: 'var(--ink-2)', lineHeight: 1.5 },
+  provTable: { borderCollapse: 'collapse', width: '100%' },
+  provKey: { padding: '2px 0', color: 'var(--ink-2)' },
+  provVal: { padding: '2px 0', textAlign: 'right' },
+  ghost: { background: 'transparent', border: '1px solid var(--rule)', padding: '5px 11px', borderRadius: 5, cursor: 'pointer', fontSize: 12 },
+  dim: { color: 'var(--ink-3)', fontSize: 12 },
+  primary: { background: 'var(--accent)', color: '#fff', border: 0, padding: '6px 12px', borderRadius: 5, cursor: 'pointer', fontSize: 12 },
+  exportGroup: { display: 'inline-flex', alignItems: 'center', gap: 2, border: '1px solid var(--rule)', borderRadius: 5, padding: '0 6px' },
+  select: { border: '1px solid var(--rule)', borderRadius: 5, padding: '4px 8px', fontSize: 12 },
+  seg: { display: 'inline-flex', border: '1px solid var(--rule)', borderRadius: 5, overflow: 'hidden' },
+  segBtn: { border: 0, background: 'var(--surface)', padding: '5px 11px', cursor: 'pointer', fontSize: 12, color: 'var(--ink-2)' },
+  segOn: { background: 'var(--accent)', color: '#fff' },
+}

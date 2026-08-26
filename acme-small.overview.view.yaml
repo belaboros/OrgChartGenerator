@@ -1,0 +1,25 @@
+org: ACME-small
+version: 1
+encoding: enclosure
+arrangement:
+  default: fit
+detail:
+  positions: true
+  occupantNames: true
+  counts: false
+style:
+  org: {border: 3, font: 17, fill: "#fafafa"}
+  teamDepth: {"1": {border: 2, font: 15, fill: "#f1f6ff"}, "2": {border: 1, font: 13, fill: "#ffffff"}, "3": {border: 1, font: 12, fill: "#fcfcfd"}}
+  vacant: {fill: "#ffe4e4", text: "#b02020"}
+geometry:
+  ACME-small: {x: 0, y: 0, w: 942, h: 720}
+  ACME-small/retail: {x: 10, y: 34, w: 922, h: 672}
+  ACME-small/retail/CheckoutCore: {x: 20, y: 143, w: 455, h: 388}
+  ACME-small/retail/CheckoutCore/FraudManagement: {x: 30, y: 398, w: 212, h: 104}
+  ACME-small/retail/CheckoutCore/FraudPlatform: {x: 247, y: 237, w: 218, h: 149}
+  ACME-small/retail/CheckoutCore/NotificationCore: {x: 30, y: 237, w: 205, h: 89}
+  ACME-small/retail/CheckoutCore/NotificationPlatform: {x: 254, y: 398, w: 205, h: 119}
+  ACME-small/retail/SearchCore: {x: 711, y: 143, w: 212, h: 134}
+  ACME-small/retail/SearchEngineering: {x: 20, y: 543, w: 212, h: 104}
+  ACME-small/retail/ShippingCore: {x: 244, y: 543, w: 205, h: 149}
+  ACME-small/retail/WalletExperience: {x: 487, y: 143, w: 212, h: 89}
