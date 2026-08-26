@@ -1,0 +1,95 @@
+# yaml-language-server: $schema=./schemas/employees.schema.json
+org: ACME-small
+version: 1
+
+employees:
+  aisha.weber@acme.com:
+    name: Aisha Weber
+  anja.petrov@acme.com:
+    name: Anja Petrov
+  bruno.haddad@acme.com:
+    name: Bruno Haddad
+  bruno.petrov@acme.com:
+    name: Bruno Petrov
+  chiara.berg@acme.com:
+    name: Chiara Berg
+  chiara.jensen@acme.com:
+    name: Chiara Jensen
+  chiara.tanaka@acme.com:
+    name: Chiara Tanaka
+  dana.ferreira@acme.com:
+    name: Dana Ferreira
+  diego.dubois@acme.com:
+    name: Diego Dubois
+  elias.diallo@acme.com:
+    name: Elias Diallo
+  elias.jensen@acme.com:
+    name: Elias Jensen
+  hanna.kovac@acme.com:
+    name: Hanna Kovac
+  hanna.moreau@acme.com:
+    name: Hanna Moreau
+  idris.costa@acme.com:
+    name: Idris Costa
+  idris.kovac@acme.com:
+    name: Idris Kovac
+  idris.silva@acme.com:
+    name: Idris Silva
+  jane.dubois@acme.com:
+    name: Jane Dubois
+  jonas.lindqvist@acme.com:
+    name: Jonas Lindqvist
+  kwame.raman@acme.com:
+    name: Kwame Raman
+  lars.ferreira@acme.com:
+    name: Lars Ferreira
+  leila.petrov@acme.com:
+    name: Leila Petrov
+  marta.rossi@acme.com:
+    name: Marta Rossi
+  mei.rossi@acme.com:
+    name: Mei Rossi
+  miguel.kovac@acme.com:
+    name: Miguel Kovac
+  nils.bianchi@acme.com:
+    name: Nils Bianchi
+  nils.lindqvist@acme.com:
+    name: Nils Lindqvist
+  nils.nowak@acme.com:
+    name: Nils Nowak
+  noor.weber@acme.com:
+    name: Noor Weber
+  omar.haq@acme.com:
+    name: Omar Haq
+  pedro.weber@acme.com:
+    name: Pedro Weber
+  priya.haddad@acme.com:
+    name: Priya Haddad
+  priya.lindqvist@acme.com:
+    name: Priya Lindqvist
+  priya.mensah@acme.com:
+    name: Priya Mensah
+  samir.novak@acme.com:
+    name: Samir Novak
+  samir.raman@acme.com:
+    name: Samir Raman
+  samir.tanaka@acme.com:
+    name: Samir Tanaka
+  sofia.jensen@acme.com:
+    name: Sofia Jensen
+  sofia.okafor@acme.com:
+    name: Sofia Okafor
+  sofia.petrov@acme.com:
+    name: Sofia Petrov
+  sofia.silva@acme.com:
+    name: Sofia Silva
+  tariq.ceallaigh@acme.com:
+    name: Tariq Ceallaigh
+  tariq.jensen@acme.com:
+    name: Tariq Jensen
+  tom.ceallaigh@acme.com:
+    name: Tom Ceallaigh
+  tom.ferreira@acme.com:
+    name: Tom Ferreira
+  viktor.jensen@acme.com:
+    name: Viktor Jensen

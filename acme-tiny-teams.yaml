@@ -1,0 +1,45 @@
+# yaml-language-server: $schema=./schemas/teams.schema.json
+org: ACME
+version: 1
+
+teams:
+  Executive:
+    positions:
+      - title: CEO
+        occupant: dana@acme.com
+      - title: CTO
+        description: Approved in the FY26 plan, search underway.
+
+  retail:
+    positions:
+      - title: DirectorOfRetail
+        occupant: miguel@acme.com
+    teams:
+      OrderManagement:
+        positions:
+          - title: EngineeringManager
+            occupant: priya@acme.com
+          - title: SeniorBackendEngineer
+            occupant: jane@acme.com
+            description: Owns the order pipeline.
+          - title: SeniorBackendEngineer
+          - title: BackendEngineer
+            occupant: tom@acme.com
+      Storefront:
+        positions:
+          - title: InterimLead
+            occupant: priya@acme.com
+            description: Held alongside the OrderManagement post until the team has its own manager.
+          - title: FrontendEngineer
+            occupant: lars@acme.com
+          - title: UXDesigner
+
+  platform:
+    teams:
+      Infrastructure:
+        positions:
+          - title: PlatformEngineer
+            occupant: amina@acme.com
+          - title: PlatformEngineer
+            occupant: kwame@acme.com
+      Data: {}

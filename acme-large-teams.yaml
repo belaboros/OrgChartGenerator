@@ -1,0 +1,1211 @@
+# yaml-language-server: $schema=./schemas/teams.schema.json
+org: ACME-large
+version: 1
+
+teams:
+  retail:
+    positions:
+      - title: ProductOwner
+        occupant: marta.moreau@acme.com
+      - title: Developer
+        occupant: marta.santos@acme.com
+      - title: Developer
+        occupant: noor.silva@acme.com
+      - title: Developer
+        occupant: marta.dubois@acme.com
+      - title: DomainArchitect
+        occupant: amina.moreno@acme.com
+      - title: SystemArchitect
+        occupant: sofia.costa@acme.com
+    teams:
+      LoyaltyCore:
+        positions:
+          - title: ProductOwner
+            occupant: pedro.moreno@acme.com
+          - title: Developer
+            occupant: lena.tanaka@acme.com
+          - title: Developer
+            occupant: diego.ferreira@acme.com
+          - title: Developer
+            occupant: marta.weber@acme.com
+          - title: DomainArchitect
+            occupant: jonas.eriksen@acme.com
+        teams:
+          ReportingOperations:
+            positions:
+              - title: ProductOwner
+                occupant: ines.haddad@acme.com
+              - title: Developer
+                occupant: priya.eriksen@acme.com
+              - title: Developer
+                occupant: leila.kaur@acme.com
+              - title: Developer
+                occupant: pedro.diallo@acme.com
+              - title: Developer
+                occupant: dana.weber@acme.com
+          IdentityExperience:
+            positions:
+              - title: ProductOwner
+                occupant: aisha.petrov@acme.com
+              - title: Developer
+                occupant: sanne.raman@acme.com
+              - title: Developer
+                occupant: idris.andersen@acme.com
+              - title: Developer
+                occupant: hanna.kovac@acme.com
+          ContentEngineering:
+            positions:
+              - title: ProductOwner
+                occupant: diego.mensah@acme.com
+              - title: Developer
+                occupant: pedro.tanaka@acme.com
+              - title: Developer
+                occupant: rafael.vargas@acme.com
+              - title: Developer
+                occupant: leila.tanaka@acme.com
+          IdentityServices:
+            positions:
+              - title: ProductOwner
+                occupant: diego.weber@acme.com
+              - title: Developer
+                occupant: diego.andersen@acme.com
+              - title: Developer
+          MessagingOperations:
+            positions:
+              - title: ProductOwner
+                occupant: sanne.kaur@acme.com
+              - title: Developer
+                occupant: miguel.doe@acme.com
+              - title: Developer
+              - title: Developer
+                occupant: tariq.ferreira@acme.com
+      MediaCore:
+        positions:
+          - title: ProductOwner
+            occupant: nils.jensen@acme.com
+          - title: Developer
+            occupant: chiara.okafor@acme.com
+          - title: Developer
+            occupant: miguel.mensah@acme.com
+          - title: Developer
+            occupant: elias.okafor@acme.com
+          - title: Developer
+            occupant: lena.santos@acme.com
+          - title: Developer
+            occupant: idris.moreau@acme.com
+          - title: Developer
+            occupant: dana.vargas@acme.com
+          - title: DomainArchitect
+            occupant: chiara.weber@acme.com
+        teams:
+          TaxServices:
+            positions:
+              - title: ProductOwner
+                occupant: lars.dubois@acme.com
+              - title: Developer
+              - title: Developer
+                occupant: kwame.haddad@acme.com
+              - title: Developer
+                occupant: diego.raman@acme.com
+              - title: Developer
+                occupant: nils.novak@acme.com
+          BillingSystems:
+            positions:
+              - title: ProductOwner
+                occupant: yuki.haq@acme.com
+              - title: Developer
+                occupant: omar.andersen@acme.com
+              - title: Developer
+                occupant: samir.nowak@acme.com
+              - title: Developer
+                occupant: fatima.lindqvist@acme.com
+          SupplierPlatform:
+            positions:
+              - title: ProductOwner
+              - title: Developer
+                occupant: amina.vargas@acme.com
+              - title: Developer
+                occupant: fatima.mensah@acme.com
+              - title: Developer
+                occupant: bruno.lindqvist@acme.com
+              - title: Developer
+                occupant: rafael.mensah@acme.com
+              - title: Developer
+                occupant: lena.rossi@acme.com
+              - title: Developer
+                occupant: sofia.lindqvist@acme.com
+      TaxExperience:
+        positions:
+          - title: ProductOwner
+            occupant: jane.dubois@acme.com
+          - title: Developer
+            occupant: sofia.mensah@acme.com
+          - title: Developer
+            occupant: tariq.dubois@acme.com
+          - title: Developer
+            occupant: chiara.mensah@acme.com
+          - title: Developer
+            occupant: omar.haq@acme.com
+          - title: Developer
+            occupant: kwame.eriksen@acme.com
+          - title: DomainArchitect
+            occupant: tom.kaur@acme.com
+        teams:
+          WalletManagement:
+            positions:
+              - title: ProductOwner
+                occupant: jonas.berg@acme.com
+              - title: Developer
+                occupant: leila.dubois@acme.com
+              - title: Developer
+                occupant: tom.novak@acme.com
+              - title: Developer
+                occupant: pedro.bianchi@acme.com
+          NotificationEngineering:
+            positions:
+              - title: ProductOwner
+                occupant: samir.okafor@acme.com
+              - title: Developer
+                occupant: kwame.petrov@acme.com
+              - title: Developer
+                occupant: yuki.kovac@acme.com
+          NotificationSystems:
+            positions:
+              - title: ProductOwner
+                occupant: fatima.petrov@acme.com
+              - title: Developer
+                occupant: elias.silva@acme.com
+              - title: Developer
+                occupant: yuki.doe@acme.com
+              - title: Developer
+                occupant: elias.eriksen@acme.com
+              - title: Developer
+                occupant: rafael.weber@acme.com
+          WalletServices:
+            positions:
+              - title: ProductOwner
+              - title: Developer
+                occupant: jonas.costa@acme.com
+              - title: Developer
+                occupant: amina.haq@acme.com
+              - title: Developer
+                occupant: anja.bianchi@acme.com
+      InventoryOperations:
+        positions:
+          - title: ProductOwner
+            occupant: jane.raman@acme.com
+          - title: Developer
+            occupant: chiara.diallo@acme.com
+          - title: Developer
+            occupant: rafael.eriksen@acme.com
+          - title: Developer
+            occupant: samir.vargas@acme.com
+          - title: Developer
+            occupant: lars.jensen@acme.com
+          - title: DomainArchitect
+            occupant: dana.okafor@acme.com
+        teams:
+          ReturnsExperience:
+            positions:
+              - title: ProductOwner
+                occupant: nils.haddad@acme.com
+              - title: Developer
+                occupant: marta.petrov@acme.com
+              - title: Developer
+                occupant: sanne.eriksen@acme.com
+              - title: Developer
+                occupant: marta.mensah@acme.com
+              - title: Developer
+                occupant: diego.berg@acme.com
+              - title: Developer
+                occupant: idris.moreno@acme.com
+          OrderEngineering:
+            positions:
+              - title: ProductOwner
+                occupant: pedro.costa@acme.com
+              - title: Developer
+                occupant: jonas.haddad@acme.com
+              - title: Developer
+                occupant: bruno.haq@acme.com
+              - title: Developer
+                occupant: jonas.weber@acme.com
+          SettlementEngineering:
+            positions:
+              - title: ProductOwner
+                occupant: idris.vargas@acme.com
+              - title: Developer
+                occupant: samir.jensen@acme.com
+              - title: Developer
+                occupant: omar.moreno@acme.com
+              - title: Developer
+                occupant: nils.bianchi@acme.com
+              - title: Developer
+                occupant: diego.eriksen@acme.com
+              - title: Developer
+                occupant: elias.petrov@acme.com
+              - title: Developer
+                occupant: diego.rossi@acme.com
+          FraudEngineering:
+            positions:
+              - title: ProductOwner
+                occupant: sanne.ceallaigh@acme.com
+              - title: Developer
+                occupant: idris.raman@acme.com
+              - title: Developer
+                occupant: ines.moreno@acme.com
+      AnalyticsEngineering:
+        positions:
+          - title: ProductOwner
+            occupant: tariq.lindqvist@acme.com
+          - title: Developer
+            occupant: lena.moreno@acme.com
+          - title: Developer
+            occupant: mei.weber@acme.com
+          - title: Developer
+            occupant: tom.jensen@acme.com
+          - title: Developer
+            occupant: jonas.rossi@acme.com
+          - title: Developer
+            occupant: jonas.dubois@acme.com
+          - title: Developer
+            occupant: pedro.petrov@acme.com
+  platform:
+    positions:
+      - title: ProductOwner
+      - title: Developer
+      - title: Developer
+        occupant: noor.jensen@acme.com
+      - title: Developer
+        occupant: samir.doe@acme.com
+      - title: Developer
+        occupant: fatima.okafor@acme.com
+      - title: DomainArchitect
+        occupant: tom.costa@acme.com
+      - title: SystemArchitect
+        occupant: nils.haq@acme.com
+    teams:
+      MessagingEngineering:
+        positions:
+          - title: ProductOwner
+            occupant: tariq.berg@acme.com
+          - title: Developer
+            occupant: noor.andersen@acme.com
+          - title: Developer
+            occupant: ines.santos@acme.com
+          - title: Developer
+            occupant: tom.haddad@acme.com
+          - title: Developer
+            occupant: noor.weber@acme.com
+          - title: DomainArchitect
+            occupant: amina.kovac@acme.com
+        teams:
+          OnboardingManagement:
+            positions:
+              - title: ProductOwner
+              - title: Developer
+                occupant: miguel.novak@acme.com
+              - title: Developer
+                occupant: dana.kovac@acme.com
+          CatalogCore:
+            positions:
+              - title: ProductOwner
+                occupant: omar.novak@acme.com
+              - title: Developer
+                occupant: viktor.diallo@acme.com
+              - title: Developer
+                occupant: lars.okafor@acme.com
+          SettlementManagement:
+            positions:
+              - title: ProductOwner
+                occupant: idris.haq@acme.com
+              - title: Developer
+                occupant: ines.dubois@acme.com
+              - title: Developer
+                occupant: sanne.andersen@acme.com
+              - title: Developer
+                occupant: viktor.andersen@acme.com
+          PricingSystems:
+            positions:
+              - title: ProductOwner
+                occupant: samir.berg@acme.com
+              - title: Developer
+                occupant: jonas.lindqvist@acme.com
+              - title: Developer
+                occupant: sofia.petrov@acme.com
+              - title: Developer
+                occupant: lena.silva@acme.com
+              - title: Developer
+                occupant: marta.doe@acme.com
+              - title: Developer
+                occupant: nils.okafor@acme.com
+              - title: Developer
+                occupant: jonas.nowak@acme.com
+          RoutingEngineering:
+            positions:
+              - title: ProductOwner
+              - title: Developer
+                occupant: nils.eriksen@acme.com
+              - title: Developer
+                occupant: aisha.bianchi@acme.com
+              - title: Developer
+                occupant: bruno.haddad@acme.com
+              - title: Developer
+                occupant: sofia.santos@acme.com
+              - title: Developer
+                occupant: miguel.nowak@acme.com
+              - title: Developer
+                occupant: jonas.moreau@acme.com
+      SearchManagement:
+        positions:
+          - title: ProductOwner
+            occupant: kwame.nowak@acme.com
+          - title: Developer
+            occupant: diego.costa@acme.com
+          - title: Developer
+            occupant: ines.okafor@acme.com
+          - title: Developer
+            occupant: lars.tanaka@acme.com
+          - title: Developer
+            occupant: noor.mensah@acme.com
+          - title: Developer
+            occupant: marta.silva@acme.com
+          - title: DomainArchitect
+        teams:
+          InventoryManagement:
+            positions:
+              - title: ProductOwner
+                occupant: bruno.novak@acme.com
+              - title: Developer
+                occupant: aisha.diallo@acme.com
+              - title: Developer
+                occupant: chiara.moreno@acme.com
+              - title: Developer
+                occupant: pedro.ceallaigh@acme.com
+          ComplianceManagement:
+            positions:
+              - title: ProductOwner
+                occupant: omar.costa@acme.com
+              - title: Developer
+              - title: Developer
+              - title: Developer
+                occupant: bruno.nowak@acme.com
+              - title: Developer
+                occupant: sofia.diallo@acme.com
+          BillingServices:
+            positions:
+              - title: ProductOwner
+                occupant: mei.bianchi@acme.com
+              - title: Developer
+                occupant: anja.haddad@acme.com
+              - title: Developer
+                occupant: marta.raman@acme.com
+              - title: Developer
+                occupant: rafael.santos@acme.com
+              - title: Developer
+                occupant: mei.costa@acme.com
+              - title: Developer
+                occupant: viktor.raman@acme.com
+              - title: Developer
+                occupant: tariq.eriksen@acme.com
+          FraudSystems:
+            positions:
+              - title: ProductOwner
+                occupant: leila.eriksen@acme.com
+              - title: Developer
+                occupant: rafael.haq@acme.com
+              - title: Developer
+                occupant: samir.raman@acme.com
+              - title: Developer
+                occupant: jane.tanaka@acme.com
+      MediaExperience:
+        positions:
+          - title: ProductOwner
+            occupant: jonas.haq@acme.com
+          - title: Developer
+            occupant: amina.mensah@acme.com
+          - title: Developer
+          - title: Developer
+            occupant: omar.rossi@acme.com
+          - title: Developer
+            occupant: viktor.haddad@acme.com
+          - title: DomainArchitect
+            occupant: miguel.moreno@acme.com
+        teams:
+          WarehouseOperations:
+            positions:
+              - title: ProductOwner
+                occupant: viktor.bianchi@acme.com
+              - title: Developer
+                occupant: jonas.moreno@acme.com
+              - title: Developer
+                occupant: pedro.ferreira@acme.com
+          CheckoutCore:
+            positions:
+              - title: ProductOwner
+                occupant: jonas.andersen@acme.com
+              - title: Developer
+                occupant: miguel.jensen@acme.com
+              - title: Developer
+                occupant: diego.kaur@acme.com
+          WalletExperience:
+            positions:
+              - title: ProductOwner
+                occupant: lena.doe@acme.com
+              - title: Developer
+                occupant: rafael.moreno@acme.com
+              - title: Developer
+                occupant: priya.kovac@acme.com
+          ContentSystems:
+            positions:
+              - title: ProductOwner
+                occupant: ines.bianchi@acme.com
+              - title: Developer
+                occupant: sofia.okafor@acme.com
+              - title: Developer
+                occupant: pedro.rossi@acme.com
+          OrderOperations:
+            positions:
+              - title: ProductOwner
+                occupant: lena.costa@acme.com
+              - title: Developer
+              - title: Developer
+                occupant: jonas.kaur@acme.com
+              - title: Developer
+                occupant: elias.novak@acme.com
+      ShippingCore:
+        positions:
+          - title: ProductOwner
+            occupant: fatima.raman@acme.com
+          - title: Developer
+            occupant: nils.moreno@acme.com
+          - title: Developer
+            occupant: priya.novak@acme.com
+          - title: Developer
+            occupant: tariq.novak@acme.com
+          - title: DomainArchitect
+            occupant: tom.eriksen@acme.com
+        teams:
+          NotificationExperience:
+            positions:
+              - title: ProductOwner
+                occupant: marta.moreno@acme.com
+              - title: Developer
+                occupant: elias.rossi@acme.com
+              - title: Developer
+                occupant: dana.mensah@acme.com
+              - title: Developer
+                occupant: chiara.berg@acme.com
+              - title: Developer
+                occupant: elias.santos@acme.com
+          MessagingExperience:
+            positions:
+              - title: ProductOwner
+                occupant: idris.weber@acme.com
+              - title: Developer
+                occupant: anja.haq@acme.com
+              - title: Developer
+                occupant: dana.rossi@acme.com
+              - title: Developer
+                occupant: aisha.dubois@acme.com
+          OrderSystems:
+            positions:
+              - title: ProductOwner
+                occupant: rafael.costa@acme.com
+              - title: Developer
+                occupant: jonas.ferreira@acme.com
+              - title: Developer
+                occupant: fatima.andersen@acme.com
+              - title: Developer
+                occupant: dana.kaur@acme.com
+              - title: Developer
+                occupant: ines.vargas@acme.com
+              - title: Developer
+                occupant: tariq.kovac@acme.com
+          ShippingExperience:
+            positions:
+              - title: ProductOwner
+                occupant: diego.silva@acme.com
+              - title: Developer
+                occupant: bruno.costa@acme.com
+              - title: Developer
+                occupant: dana.haddad@acme.com
+      OnboardingCore:
+        positions:
+          - title: ProductOwner
+            occupant: hanna.okafor@acme.com
+          - title: Developer
+            occupant: bruno.vargas@acme.com
+          - title: Developer
+            occupant: bruno.petrov@acme.com
+          - title: Developer
+            occupant: ines.tanaka@acme.com
+          - title: Developer
+            occupant: diego.lindqvist@acme.com
+          - title: Developer
+            occupant: fatima.haq@acme.com
+          - title: Developer
+            occupant: amina.eriksen@acme.com
+          - title: DomainArchitect
+            occupant: ines.weber@acme.com
+        teams:
+          OnboardingOperations:
+            positions:
+              - title: ProductOwner
+                occupant: nils.rossi@acme.com
+              - title: Developer
+                occupant: samir.weber@acme.com
+              - title: Developer
+                occupant: lena.haddad@acme.com
+          PricingExperience:
+            positions:
+              - title: ProductOwner
+              - title: Developer
+              - title: Developer
+                occupant: hanna.weber@acme.com
+          SettlementOperations:
+            positions:
+              - title: ProductOwner
+                occupant: elias.lindqvist@acme.com
+              - title: Developer
+                occupant: idris.rossi@acme.com
+              - title: Developer
+                occupant: aisha.jensen@acme.com
+              - title: Developer
+                occupant: tariq.haddad@acme.com
+              - title: Developer
+                occupant: sofia.berg@acme.com
+              - title: Developer
+                occupant: viktor.rossi@acme.com
+              - title: Developer
+                occupant: sofia.nowak@acme.com
+          NotificationCore:
+            positions:
+              - title: ProductOwner
+                occupant: tariq.raman@acme.com
+              - title: Developer
+                occupant: mei.novak@acme.com
+              - title: Developer
+                occupant: samir.petrov@acme.com
+              - title: Developer
+                occupant: leila.moreau@acme.com
+              - title: Developer
+                occupant: nils.lindqvist@acme.com
+              - title: Developer
+                occupant: mei.doe@acme.com
+          ReturnsOperations:
+            positions:
+              - title: ProductOwner
+                occupant: leila.ferreira@acme.com
+              - title: Developer
+                occupant: sanne.rossi@acme.com
+              - title: Developer
+                occupant: nils.silva@acme.com
+              - title: Developer
+                occupant: diego.bianchi@acme.com
+              - title: Developer
+                occupant: tom.silva@acme.com
+              - title: Developer
+                occupant: leila.santos@acme.com
+              - title: Developer
+                occupant: miguel.ceallaigh@acme.com
+  logistics:
+    positions:
+      - title: ProductOwner
+        occupant: yuki.dubois@acme.com
+      - title: Developer
+        occupant: viktor.kaur@acme.com
+      - title: Developer
+        occupant: sanne.silva@acme.com
+      - title: DomainArchitect
+        occupant: anja.ceallaigh@acme.com
+      - title: SystemArchitect
+        occupant: yuki.berg@acme.com
+    teams:
+      ShippingEngineering:
+        positions:
+          - title: ProductOwner
+            occupant: mei.raman@acme.com
+          - title: Developer
+            occupant: sanne.tanaka@acme.com
+          - title: Developer
+            occupant: fatima.dubois@acme.com
+          - title: Developer
+            occupant: miguel.costa@acme.com
+          - title: DomainArchitect
+            occupant: yuki.moreno@acme.com
+        teams:
+          PricingOperations:
+            positions:
+              - title: ProductOwner
+                occupant: elias.berg@acme.com
+              - title: Developer
+                occupant: fatima.costa@acme.com
+              - title: Developer
+                occupant: jonas.vargas@acme.com
+              - title: Developer
+                occupant: miguel.dubois@acme.com
+              - title: Developer
+                occupant: mei.tanaka@acme.com
+          FraudManagement:
+            positions:
+              - title: ProductOwner
+                occupant: anja.mensah@acme.com
+              - title: Developer
+                occupant: anja.okafor@acme.com
+              - title: Developer
+                occupant: tom.petrov@acme.com
+              - title: Developer
+                occupant: amina.costa@acme.com
+          ReportingCore:
+            positions:
+              - title: ProductOwner
+                occupant: omar.nowak@acme.com
+              - title: Developer
+                occupant: hanna.kaur@acme.com
+              - title: Developer
+                occupant: tariq.mensah@acme.com
+          CheckoutServices:
+            positions:
+              - title: ProductOwner
+                occupant: sanne.moreno@acme.com
+              - title: Developer
+                occupant: dana.nowak@acme.com
+              - title: Developer
+                occupant: lars.rossi@acme.com
+      WalletOperations:
+        positions:
+          - title: ProductOwner
+            occupant: diego.haddad@acme.com
+          - title: Developer
+            occupant: viktor.silva@acme.com
+          - title: Developer
+            occupant: amina.okafor@acme.com
+          - title: Developer
+            occupant: mei.kaur@acme.com
+          - title: Developer
+            occupant: marta.vargas@acme.com
+          - title: DomainArchitect
+            occupant: sanne.santos@acme.com
+        teams:
+          SearchServices:
+            positions:
+              - title: ProductOwner
+                occupant: bruno.eriksen@acme.com
+              - title: Developer
+                occupant: idris.okafor@acme.com
+              - title: Developer
+              - title: Developer
+                occupant: tom.haq@acme.com
+              - title: Developer
+                occupant: rafael.nowak@acme.com
+          ReportingPlatform:
+            positions:
+              - title: ProductOwner
+                occupant: hanna.eriksen@acme.com
+              - title: Developer
+                occupant: tom.lindqvist@acme.com
+              - title: Developer
+                occupant: yuki.vargas@acme.com
+          NotificationServices:
+            positions:
+              - title: ProductOwner
+              - title: Developer
+                occupant: jane.nowak@acme.com
+              - title: Developer
+                occupant: lars.eriksen@acme.com
+              - title: Developer
+                occupant: samir.haq@acme.com
+              - title: Developer
+                occupant: viktor.mensah@acme.com
+              - title: Developer
+                occupant: sanne.moreau@acme.com
+      RoutingCore:
+        positions:
+          - title: ProductOwner
+            occupant: noor.ceallaigh@acme.com
+          - title: Developer
+            occupant: jane.doe@acme.com
+          - title: Developer
+          - title: Developer
+            occupant: amina.raman@acme.com
+          - title: Developer
+            occupant: fatima.moreno@acme.com
+          - title: Developer
+            occupant: noor.okafor@acme.com
+          - title: Developer
+            occupant: dana.petrov@acme.com
+          - title: DomainArchitect
+            occupant: sofia.haq@acme.com
+        teams:
+          RecommendationExperience:
+            positions:
+              - title: ProductOwner
+                occupant: anja.rossi@acme.com
+              - title: Developer
+                occupant: miguel.tanaka@acme.com
+              - title: Developer
+                occupant: elias.dubois@acme.com
+              - title: Developer
+                occupant: ines.silva@acme.com
+              - title: Developer
+                occupant: tariq.petrov@acme.com
+          RoutingServices:
+            positions:
+              - title: ProductOwner
+                occupant: pedro.moreau@acme.com
+              - title: Developer
+                occupant: kwame.tanaka@acme.com
+              - title: Developer
+                occupant: leila.doe@acme.com
+              - title: Developer
+                occupant: mei.vargas@acme.com
+              - title: Developer
+                occupant: tariq.andersen@acme.com
+              - title: Developer
+                occupant: lars.ferreira@acme.com
+          CatalogExperience:
+            positions:
+              - title: ProductOwner
+                occupant: noor.rossi@acme.com
+              - title: Developer
+                occupant: viktor.weber@acme.com
+              - title: Developer
+                occupant: kwame.ferreira@acme.com
+              - title: Developer
+                occupant: diego.jensen@acme.com
+              - title: Developer
+                occupant: tom.okafor@acme.com
+      PricingManagement:
+        positions:
+          - title: ProductOwner
+            occupant: sanne.lindqvist@acme.com
+          - title: Developer
+            occupant: marta.jensen@acme.com
+          - title: Developer
+            occupant: viktor.costa@acme.com
+          - title: Developer
+            occupant: jane.petrov@acme.com
+          - title: Developer
+            occupant: fatima.diallo@acme.com
+          - title: Developer
+            occupant: aisha.ferreira@acme.com
+          - title: DomainArchitect
+        teams:
+          OnboardingServices:
+            positions:
+              - title: ProductOwner
+                occupant: priya.diallo@acme.com
+              - title: Developer
+                occupant: aisha.rossi@acme.com
+              - title: Developer
+                occupant: jonas.doe@acme.com
+              - title: Developer
+                occupant: leila.haddad@acme.com
+          SubscriptionExperience:
+            positions:
+              - title: ProductOwner
+                occupant: noor.kovac@acme.com
+              - title: Developer
+                occupant: chiara.moreau@acme.com
+              - title: Developer
+                occupant: rafael.kovac@acme.com
+              - title: Developer
+                occupant: hanna.ceallaigh@acme.com
+              - title: Developer
+                occupant: bruno.rossi@acme.com
+              - title: Developer
+                occupant: lena.vargas@acme.com
+          CheckoutExperience:
+            positions:
+              - title: ProductOwner
+                occupant: anja.petrov@acme.com
+              - title: Developer
+                occupant: elias.raman@acme.com
+              - title: Developer
+                occupant: ines.nowak@acme.com
+              - title: Developer
+                occupant: tom.kovac@acme.com
+              - title: Developer
+                occupant: jane.kovac@acme.com
+          ForecastingSystems:
+            positions:
+              - title: ProductOwner
+                occupant: yuki.haddad@acme.com
+              - title: Developer
+                occupant: priya.haq@acme.com
+              - title: Developer
+                occupant: hanna.nowak@acme.com
+              - title: Developer
+                occupant: pedro.mensah@acme.com
+      ComplianceExperience:
+        positions:
+          - title: ProductOwner
+            occupant: kwame.haq@acme.com
+          - title: Developer
+            occupant: hanna.rossi@acme.com
+          - title: Developer
+            occupant: bruno.doe@acme.com
+          - title: Developer
+            occupant: aisha.moreau@acme.com
+  finance:
+    positions:
+      - title: ProductOwner
+        occupant: leila.vargas@acme.com
+      - title: Developer
+        occupant: bruno.diallo@acme.com
+      - title: Developer
+        occupant: sanne.bianchi@acme.com
+      - title: Developer
+        occupant: chiara.raman@acme.com
+      - title: Developer
+        occupant: miguel.rossi@acme.com
+      - title: Developer
+        occupant: yuki.novak@acme.com
+      - title: DomainArchitect
+      - title: SystemArchitect
+        occupant: jane.moreno@acme.com
+    teams:
+      OnboardingExperience:
+        positions:
+          - title: ProductOwner
+            occupant: ines.raman@acme.com
+          - title: Developer
+            occupant: dana.moreau@acme.com
+          - title: Developer
+            occupant: lena.andersen@acme.com
+          - title: Developer
+            occupant: kwame.doe@acme.com
+          - title: DomainArchitect
+            occupant: yuki.ceallaigh@acme.com
+        teams:
+          ReturnsSystems:
+            positions:
+              - title: ProductOwner
+              - title: Developer
+                occupant: tariq.silva@acme.com
+              - title: Developer
+                occupant: miguel.bianchi@acme.com
+              - title: Developer
+                occupant: amina.ferreira@acme.com
+              - title: Developer
+                occupant: ines.petrov@acme.com
+              - title: Developer
+                occupant: yuki.eriksen@acme.com
+              - title: Developer
+                occupant: viktor.berg@acme.com
+          CompliancePlatform:
+            positions:
+              - title: ProductOwner
+                occupant: pedro.jensen@acme.com
+              - title: Developer
+                occupant: jane.ferreira@acme.com
+              - title: Developer
+                occupant: miguel.santos@acme.com
+              - title: Developer
+                occupant: miguel.eriksen@acme.com
+              - title: Developer
+                occupant: leila.costa@acme.com
+              - title: Developer
+                occupant: yuki.weber@acme.com
+              - title: Developer
+          PaymentPlatform:
+            positions:
+              - title: ProductOwner
+                occupant: sanne.haddad@acme.com
+              - title: Developer
+                occupant: hanna.dubois@acme.com
+              - title: Developer
+                occupant: lars.doe@acme.com
+              - title: Developer
+                occupant: sanne.dubois@acme.com
+              - title: Developer
+                occupant: dana.diallo@acme.com
+              - title: Developer
+                occupant: pedro.haddad@acme.com
+      PaymentCore:
+        positions:
+          - title: ProductOwner
+            occupant: miguel.raman@acme.com
+          - title: Developer
+            occupant: kwame.kaur@acme.com
+          - title: Developer
+            occupant: fatima.silva@acme.com
+          - title: DomainArchitect
+        teams:
+          ReportingExperience:
+            positions:
+              - title: ProductOwner
+                occupant: amina.petrov@acme.com
+              - title: Developer
+                occupant: elias.bianchi@acme.com
+              - title: Developer
+                occupant: kwame.santos@acme.com
+          IdentityManagement:
+            positions:
+              - title: ProductOwner
+              - title: Developer
+                occupant: sofia.moreno@acme.com
+              - title: Developer
+                occupant: amina.nowak@acme.com
+              - title: Developer
+              - title: Developer
+                occupant: fatima.eriksen@acme.com
+          IdentityPlatform:
+            positions:
+              - title: ProductOwner
+                occupant: viktor.santos@acme.com
+              - title: Developer
+                occupant: jane.andersen@acme.com
+              - title: Developer
+                occupant: mei.moreno@acme.com
+              - title: Developer
+                occupant: kwame.raman@acme.com
+              - title: Developer
+                occupant: priya.ferreira@acme.com
+              - title: Developer
+                occupant: samir.diallo@acme.com
+          PaymentSystems:
+            positions:
+              - title: ProductOwner
+                occupant: chiara.kaur@acme.com
+              - title: Developer
+                occupant: idris.berg@acme.com
+              - title: Developer
+                occupant: lena.diallo@acme.com
+              - title: Developer
+                occupant: viktor.doe@acme.com
+              - title: Developer
+                occupant: yuki.lindqvist@acme.com
+      OnboardingSystems:
+        positions:
+          - title: ProductOwner
+            occupant: rafael.rossi@acme.com
+          - title: Developer
+            occupant: leila.petrov@acme.com
+          - title: Developer
+            occupant: bruno.ferreira@acme.com
+          - title: DomainArchitect
+            occupant: yuki.ferreira@acme.com
+        teams:
+          LoyaltyPlatform:
+            positions:
+              - title: ProductOwner
+                occupant: sofia.kaur@acme.com
+              - title: Developer
+                occupant: noor.haq@acme.com
+              - title: Developer
+                occupant: jane.berg@acme.com
+          PaymentServices:
+            positions:
+              - title: ProductOwner
+                occupant: nils.santos@acme.com
+              - title: Developer
+                occupant: fatima.ferreira@acme.com
+              - title: Developer
+                occupant: omar.jensen@acme.com
+              - title: Developer
+                occupant: noor.costa@acme.com
+          LoyaltyServices:
+            positions:
+              - title: ProductOwner
+                occupant: jane.weber@acme.com
+              - title: Developer
+                occupant: chiara.ferreira@acme.com
+              - title: Developer
+                occupant: yuki.tanaka@acme.com
+              - title: Developer
+                occupant: chiara.nowak@acme.com
+  customer:
+    positions:
+      - title: ProductOwner
+        occupant: sofia.raman@acme.com
+      - title: Developer
+        occupant: sofia.weber@acme.com
+      - title: Developer
+        occupant: noor.novak@acme.com
+      - title: Developer
+        occupant: marta.ferreira@acme.com
+      - title: Developer
+        occupant: priya.doe@acme.com
+      - title: DomainArchitect
+        occupant: hanna.raman@acme.com
+      - title: SystemArchitect
+        occupant: nils.ceallaigh@acme.com
+    teams:
+      BillingOperations:
+        positions:
+          - title: ProductOwner
+            occupant: samir.kovac@acme.com
+          - title: Developer
+            occupant: samir.silva@acme.com
+          - title: Developer
+            occupant: amina.berg@acme.com
+          - title: Developer
+            occupant: amina.doe@acme.com
+          - title: Developer
+            occupant: marta.costa@acme.com
+          - title: DomainArchitect
+            occupant: lena.ceallaigh@acme.com
+        teams:
+          PricingServices:
+            positions:
+              - title: ProductOwner
+                occupant: sanne.vargas@acme.com
+              - title: Developer
+                occupant: tariq.nowak@acme.com
+              - title: Developer
+                occupant: ines.ferreira@acme.com
+              - title: Developer
+                occupant: samir.mensah@acme.com
+              - title: Developer
+                occupant: marta.andersen@acme.com
+              - title: Developer
+                occupant: marta.rossi@acme.com
+          PaymentExperience:
+            positions:
+              - title: ProductOwner
+                occupant: elias.haddad@acme.com
+              - title: Developer
+                occupant: kwame.diallo@acme.com
+              - title: Developer
+                occupant: sanne.petrov@acme.com
+              - title: Developer
+                occupant: ines.berg@acme.com
+              - title: Developer
+                occupant: sofia.haddad@acme.com
+              - title: Developer
+                occupant: pedro.novak@acme.com
+              - title: Developer
+                occupant: viktor.ceallaigh@acme.com
+          ContentServices:
+            positions:
+              - title: ProductOwner
+                occupant: marta.berg@acme.com
+              - title: Developer
+                occupant: mei.berg@acme.com
+              - title: Developer
+                occupant: kwame.andersen@acme.com
+              - title: Developer
+                occupant: rafael.jensen@acme.com
+              - title: Developer
+                occupant: tariq.moreau@acme.com
+              - title: Developer
+                occupant: mei.andersen@acme.com
+          IdentityOperations:
+            positions:
+              - title: ProductOwner
+              - title: Developer
+                occupant: sanne.jensen@acme.com
+              - title: Developer
+                occupant: elias.moreau@acme.com
+      ReturnsEngineering:
+        positions:
+          - title: ProductOwner
+            occupant: chiara.kovac@acme.com
+          - title: Developer
+            occupant: mei.jensen@acme.com
+          - title: Developer
+            occupant: anja.lindqvist@acme.com
+          - title: Developer
+            occupant: ines.diallo@acme.com
+          - title: Developer
+            occupant: fatima.jensen@acme.com
+          - title: Developer
+            occupant: priya.raman@acme.com
+          - title: DomainArchitect
+            occupant: hanna.haq@acme.com
+        teams:
+          WalletEngineering:
+            positions:
+              - title: ProductOwner
+                occupant: viktor.lindqvist@acme.com
+              - title: Developer
+                occupant: amina.andersen@acme.com
+              - title: Developer
+                occupant: mei.haddad@acme.com
+          ForecastingCore:
+            positions:
+              - title: ProductOwner
+                occupant: pedro.andersen@acme.com
+              - title: Developer
+                occupant: omar.lindqvist@acme.com
+              - title: Developer
+                occupant: miguel.kaur@acme.com
+              - title: Developer
+                occupant: pedro.vargas@acme.com
+              - title: Developer
+                occupant: tariq.rossi@acme.com
+          OrderCore:
+            positions:
+              - title: ProductOwner
+                occupant: dana.dubois@acme.com
+              - title: Developer
+                occupant: kwame.dubois@acme.com
+              - title: Developer
+                occupant: pedro.santos@acme.com
+      SearchPlatform:
+        positions:
+          - title: ProductOwner
+            occupant: chiara.lindqvist@acme.com
+          - title: Developer
+          - title: Developer
+            occupant: lars.nowak@acme.com
+          - title: DomainArchitect
+            occupant: dana.andersen@acme.com
+        teams:
+          CheckoutPlatform:
+            positions:
+              - title: ProductOwner
+                occupant: hanna.tanaka@acme.com
+              - title: Developer
+                occupant: lena.eriksen@acme.com
+              - title: Developer
+                occupant: lena.haq@acme.com
+              - title: Developer
+                occupant: aisha.silva@acme.com
+              - title: Developer
+                occupant: omar.eriksen@acme.com
+              - title: Developer
+                occupant: nils.ferreira@acme.com
+          ReturnsCore:
+            positions:
+              - title: ProductOwner
+                occupant: nils.vargas@acme.com
+              - title: Developer
+                occupant: bruno.moreau@acme.com
+              - title: Developer
+                occupant: priya.rossi@acme.com
+              - title: Developer
+                occupant: bruno.weber@acme.com
+              - title: Developer
+                occupant: chiara.vargas@acme.com
+              - title: Developer
+                occupant: anja.raman@acme.com
+              - title: Developer
+                occupant: fatima.kovac@acme.com
+          LoyaltyExperience:
+            positions:
+              - title: ProductOwner
+                occupant: lars.santos@acme.com
+              - title: Developer
+                occupant: idris.santos@acme.com
+              - title: Developer
+                occupant: tom.rossi@acme.com
+              - title: Developer
+                occupant: pedro.kaur@acme.com
+              - title: Developer
+                occupant: elias.doe@acme.com
+      SearchSystems:
+        positions:
+          - title: ProductOwner
+            occupant: diego.vargas@acme.com
+          - title: Developer
+            occupant: noor.raman@acme.com
+          - title: Developer
+            occupant: tom.andersen@acme.com
+          - title: Developer
+            occupant: lars.haq@acme.com
+          - title: Developer
+            occupant: sanne.weber@acme.com
+          - title: Developer
+            occupant: priya.ceallaigh@acme.com

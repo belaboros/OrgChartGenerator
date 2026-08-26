@@ -1,0 +1,120 @@
+# yaml-language-server: $schema=./schemas/teams.schema.json
+org: ACME-small
+version: 1
+
+teams:
+  retail:
+    positions:
+      - title: ProductOwner
+        occupant: samir.novak@acme.com
+      - title: Developer
+      - title: Developer
+        occupant: noor.weber@acme.com
+      - title: DomainArchitect
+        occupant: nils.nowak@acme.com
+      - title: SystemArchitect
+        occupant: leila.petrov@acme.com
+    teams:
+      CheckoutCore:
+        positions:
+          - title: ProductOwner
+            occupant: aisha.weber@acme.com
+          - title: Developer
+          - title: Developer
+            occupant: jane.dubois@acme.com
+          - title: DomainArchitect
+            occupant: marta.rossi@acme.com
+        teams:
+          NotificationCore:
+            positions:
+              - title: ProductOwner
+                occupant: kwame.raman@acme.com
+              - title: Developer
+                occupant: anja.petrov@acme.com
+              - title: Developer
+                occupant: nils.bianchi@acme.com
+          FraudPlatform:
+            positions:
+              - title: ProductOwner
+                occupant: viktor.jensen@acme.com
+              - title: Developer
+                occupant: idris.costa@acme.com
+              - title: Developer
+                occupant: diego.dubois@acme.com
+              - title: Developer
+                occupant: tom.ceallaigh@acme.com
+              - title: Developer
+                occupant: miguel.kovac@acme.com
+              - title: Developer
+                occupant: bruno.haddad@acme.com
+              - title: Developer
+                occupant: samir.tanaka@acme.com
+          FraudManagement:
+            positions:
+              - title: ProductOwner
+                occupant: sofia.silva@acme.com
+              - title: Developer
+                occupant: nils.lindqvist@acme.com
+              - title: Developer
+                occupant: bruno.petrov@acme.com
+              - title: Developer
+                occupant: jonas.lindqvist@acme.com
+          NotificationPlatform:
+            positions:
+              - title: ProductOwner
+                occupant: pedro.weber@acme.com
+              - title: Developer
+                occupant: sofia.petrov@acme.com
+              - title: Developer
+                occupant: mei.rossi@acme.com
+              - title: Developer
+                occupant: elias.diallo@acme.com
+              - title: Developer
+                occupant: chiara.jensen@acme.com
+      WalletExperience:
+        positions:
+          - title: ProductOwner
+            occupant: tariq.jensen@acme.com
+          - title: Developer
+            occupant: hanna.kovac@acme.com
+          - title: Developer
+            occupant: elias.jensen@acme.com
+      SearchCore:
+        positions:
+          - title: ProductOwner
+            occupant: idris.kovac@acme.com
+          - title: Developer
+            occupant: hanna.moreau@acme.com
+          - title: Developer
+            occupant: priya.haddad@acme.com
+          - title: Developer
+            occupant: priya.lindqvist@acme.com
+          - title: Developer
+            occupant: chiara.tanaka@acme.com
+          - title: Developer
+            occupant: tom.ferreira@acme.com
+      SearchEngineering:
+        positions:
+          - title: ProductOwner
+            occupant: sofia.okafor@acme.com
+          - title: Developer
+            occupant: tariq.ceallaigh@acme.com
+          - title: Developer
+            occupant: lars.ferreira@acme.com
+          - title: Developer
+            occupant: dana.ferreira@acme.com
+      ShippingCore:
+        positions:
+          - title: ProductOwner
+            occupant: samir.raman@acme.com
+          - title: Developer
+            occupant: sofia.jensen@acme.com
+          - title: Developer
+            occupant: omar.haq@acme.com
+          - title: Developer
+          - title: Developer
+            occupant: priya.mensah@acme.com
+          - title: Developer
+            occupant: chiara.berg@acme.com
+          - title: Developer
+            occupant: idris.silva@acme.com

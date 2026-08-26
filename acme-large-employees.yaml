@@ -1,0 +1,959 @@
+# yaml-language-server: $schema=./schemas/employees.schema.json
+org: ACME-large
+version: 1
+
+employees:
+  aisha.bianchi@acme.com:
+    name: Aisha Bianchi
+  aisha.diallo@acme.com:
+    name: Aisha Diallo
+  aisha.dubois@acme.com:
+    name: Aisha Dubois
+  aisha.ferreira@acme.com:
+    name: Aisha Ferreira
+  aisha.jensen@acme.com:
+    name: Aisha Jensen
+  aisha.moreau@acme.com:
+    name: Aisha Moreau
+  aisha.petrov@acme.com:
+    name: Aisha Petrov
+  aisha.rossi@acme.com:
+    name: Aisha Rossi
+  aisha.silva@acme.com:
+    name: Aisha Silva
+  amina.andersen@acme.com:
+    name: Amina Andersen
+  amina.berg@acme.com:
+    name: Amina Berg
+  amina.costa@acme.com:
+    name: Amina Costa
+  amina.doe@acme.com:
+    name: Amina Doe
+  amina.eriksen@acme.com:
+    name: Amina Eriksen
+  amina.ferreira@acme.com:
+    name: Amina Ferreira
+  amina.haq@acme.com:
+    name: Amina Haq
+  amina.kovac@acme.com:
+    name: Amina Kovac
+  amina.mensah@acme.com:
+    name: Amina Mensah
+  amina.moreno@acme.com:
+    name: Amina Moreno
+  amina.nowak@acme.com:
+    name: Amina Nowak
+  amina.okafor@acme.com:
+    name: Amina Okafor
+  amina.petrov@acme.com:
+    name: Amina Petrov
+  amina.raman@acme.com:
+    name: Amina Raman
+  amina.vargas@acme.com:
+    name: Amina Vargas
+  anja.bianchi@acme.com:
+    name: Anja Bianchi
+  anja.ceallaigh@acme.com:
+    name: Anja Ceallaigh
+  anja.haddad@acme.com:
+    name: Anja Haddad
+  anja.haq@acme.com:
+    name: Anja Haq
+  anja.lindqvist@acme.com:
+    name: Anja Lindqvist
+  anja.mensah@acme.com:
+    name: Anja Mensah
+  anja.okafor@acme.com:
+    name: Anja Okafor
+  anja.petrov@acme.com:
+    name: Anja Petrov
+  anja.raman@acme.com:
+    name: Anja Raman
+  anja.rossi@acme.com:
+    name: Anja Rossi
+  bruno.costa@acme.com:
+    name: Bruno Costa
+  bruno.diallo@acme.com:
+    name: Bruno Diallo
+  bruno.doe@acme.com:
+    name: Bruno Doe
+  bruno.eriksen@acme.com:
+    name: Bruno Eriksen
+  bruno.ferreira@acme.com:
+    name: Bruno Ferreira
+  bruno.haddad@acme.com:
+    name: Bruno Haddad
+  bruno.haq@acme.com:
+    name: Bruno Haq
+  bruno.lindqvist@acme.com:
+    name: Bruno Lindqvist
+  bruno.moreau@acme.com:
+    name: Bruno Moreau
+  bruno.novak@acme.com:
+    name: Bruno Novak
+  bruno.nowak@acme.com:
+    name: Bruno Nowak
+  bruno.petrov@acme.com:
+    name: Bruno Petrov
+  bruno.rossi@acme.com:
+    name: Bruno Rossi
+  bruno.vargas@acme.com:
+    name: Bruno Vargas
+  bruno.weber@acme.com:
+    name: Bruno Weber
+  chiara.berg@acme.com:
+    name: Chiara Berg
+  chiara.diallo@acme.com:
+    name: Chiara Diallo
+  chiara.ferreira@acme.com:
+    name: Chiara Ferreira
+  chiara.kaur@acme.com:
+    name: Chiara Kaur
+  chiara.kovac@acme.com:
+    name: Chiara Kovac
+  chiara.lindqvist@acme.com:
+    name: Chiara Lindqvist
+  chiara.mensah@acme.com:
+    name: Chiara Mensah
+  chiara.moreau@acme.com:
+    name: Chiara Moreau
+  chiara.moreno@acme.com:
+    name: Chiara Moreno
+  chiara.nowak@acme.com:
+    name: Chiara Nowak
+  chiara.okafor@acme.com:
+    name: Chiara Okafor
+  chiara.raman@acme.com:
+    name: Chiara Raman
+  chiara.vargas@acme.com:
+    name: Chiara Vargas
+  chiara.weber@acme.com:
+    name: Chiara Weber
+  dana.andersen@acme.com:
+    name: Dana Andersen
+  dana.diallo@acme.com:
+    name: Dana Diallo
+  dana.dubois@acme.com:
+    name: Dana Dubois
+  dana.haddad@acme.com:
+    name: Dana Haddad
+  dana.kaur@acme.com:
+    name: Dana Kaur
+  dana.kovac@acme.com:
+    name: Dana Kovac
+  dana.mensah@acme.com:
+    name: Dana Mensah
+  dana.moreau@acme.com:
+    name: Dana Moreau
+  dana.nowak@acme.com:
+    name: Dana Nowak
+  dana.okafor@acme.com:
+    name: Dana Okafor
+  dana.petrov@acme.com:
+    name: Dana Petrov
+  dana.rossi@acme.com:
+    name: Dana Rossi
+  dana.vargas@acme.com:
+    name: Dana Vargas
+  dana.weber@acme.com:
+    name: Dana Weber
+  diego.andersen@acme.com:
+    name: Diego Andersen
+  diego.berg@acme.com:
+    name: Diego Berg
+  diego.bianchi@acme.com:
+    name: Diego Bianchi
+  diego.costa@acme.com:
+    name: Diego Costa
+  diego.eriksen@acme.com:
+    name: Diego Eriksen
+  diego.ferreira@acme.com:
+    name: Diego Ferreira
+  diego.haddad@acme.com:
+    name: Diego Haddad
+  diego.jensen@acme.com:
+    name: Diego Jensen
+  diego.kaur@acme.com:
+    name: Diego Kaur
+  diego.lindqvist@acme.com:
+    name: Diego Lindqvist
+  diego.mensah@acme.com:
+    name: Diego Mensah
+  diego.raman@acme.com:
+    name: Diego Raman
+  diego.rossi@acme.com:
+    name: Diego Rossi
+  diego.silva@acme.com:
+    name: Diego Silva
+  diego.vargas@acme.com:
+    name: Diego Vargas
+  diego.weber@acme.com:
+    name: Diego Weber
+  elias.berg@acme.com:
+    name: Elias Berg
+  elias.bianchi@acme.com:
+    name: Elias Bianchi
+  elias.doe@acme.com:
+    name: Elias Doe
+  elias.dubois@acme.com:
+    name: Elias Dubois
+  elias.eriksen@acme.com:
+    name: Elias Eriksen
+  elias.haddad@acme.com:
+    name: Elias Haddad
+  elias.lindqvist@acme.com:
+    name: Elias Lindqvist
+  elias.moreau@acme.com:
+    name: Elias Moreau
+  elias.novak@acme.com:
+    name: Elias Novak
+  elias.okafor@acme.com:
+    name: Elias Okafor
+  elias.petrov@acme.com:
+    name: Elias Petrov
+  elias.raman@acme.com:
+    name: Elias Raman
+  elias.rossi@acme.com:
+    name: Elias Rossi
+  elias.santos@acme.com:
+    name: Elias Santos
+  elias.silva@acme.com:
+    name: Elias Silva
+  fatima.andersen@acme.com:
+    name: Fatima Andersen
+  fatima.costa@acme.com:
+    name: Fatima Costa
+  fatima.diallo@acme.com:
+    name: Fatima Diallo
+  fatima.dubois@acme.com:
+    name: Fatima Dubois
+  fatima.eriksen@acme.com:
+    name: Fatima Eriksen
+  fatima.ferreira@acme.com:
+    name: Fatima Ferreira
+  fatima.haq@acme.com:
+    name: Fatima Haq
+  fatima.jensen@acme.com:
+    name: Fatima Jensen
+  fatima.kovac@acme.com:
+    name: Fatima Kovac
+  fatima.lindqvist@acme.com:
+    name: Fatima Lindqvist
+  fatima.mensah@acme.com:
+    name: Fatima Mensah
+  fatima.moreno@acme.com:
+    name: Fatima Moreno
+  fatima.okafor@acme.com:
+    name: Fatima Okafor
+  fatima.petrov@acme.com:
+    name: Fatima Petrov
+  fatima.raman@acme.com:
+    name: Fatima Raman
+  fatima.silva@acme.com:
+    name: Fatima Silva
+  hanna.ceallaigh@acme.com:
+    name: Hanna Ceallaigh
+  hanna.dubois@acme.com:
+    name: Hanna Dubois
+  hanna.eriksen@acme.com:
+    name: Hanna Eriksen
+  hanna.haq@acme.com:
+    name: Hanna Haq
+  hanna.kaur@acme.com:
+    name: Hanna Kaur
+  hanna.kovac@acme.com:
+    name: Hanna Kovac
+  hanna.nowak@acme.com:
+    name: Hanna Nowak
+  hanna.okafor@acme.com:
+    name: Hanna Okafor
+  hanna.raman@acme.com:
+    name: Hanna Raman
+  hanna.rossi@acme.com:
+    name: Hanna Rossi
+  hanna.tanaka@acme.com:
+    name: Hanna Tanaka
+  hanna.weber@acme.com:
+    name: Hanna Weber
+  idris.andersen@acme.com:
+    name: Idris Andersen
+  idris.berg@acme.com:
+    name: Idris Berg
+  idris.haq@acme.com:
+    name: Idris Haq
+  idris.moreau@acme.com:
+    name: Idris Moreau
+  idris.moreno@acme.com:
+    name: Idris Moreno
+  idris.okafor@acme.com:
+    name: Idris Okafor
+  idris.raman@acme.com:
+    name: Idris Raman
+  idris.rossi@acme.com:
+    name: Idris Rossi
+  idris.santos@acme.com:
+    name: Idris Santos
+  idris.vargas@acme.com:
+    name: Idris Vargas
+  idris.weber@acme.com:
+    name: Idris Weber
+  ines.berg@acme.com:
+    name: Ines Berg
+  ines.bianchi@acme.com:
+    name: Ines Bianchi
+  ines.diallo@acme.com:
+    name: Ines Diallo
+  ines.dubois@acme.com:
+    name: Ines Dubois
+  ines.ferreira@acme.com:
+    name: Ines Ferreira
+  ines.haddad@acme.com:
+    name: Ines Haddad
+  ines.moreno@acme.com:
+    name: Ines Moreno
+  ines.nowak@acme.com:
+    name: Ines Nowak
+  ines.okafor@acme.com:
+    name: Ines Okafor
+  ines.petrov@acme.com:
+    name: Ines Petrov
+  ines.raman@acme.com:
+    name: Ines Raman
+  ines.santos@acme.com:
+    name: Ines Santos
+  ines.silva@acme.com:
+    name: Ines Silva
+  ines.tanaka@acme.com:
+    name: Ines Tanaka
+  ines.vargas@acme.com:
+    name: Ines Vargas
+  ines.weber@acme.com:
+    name: Ines Weber
+  jane.andersen@acme.com:
+    name: Jane Andersen
+  jane.berg@acme.com:
+    name: Jane Berg
+  jane.doe@acme.com:
+    name: Jane Doe
+  jane.dubois@acme.com:
+    name: Jane Dubois
+  jane.ferreira@acme.com:
+    name: Jane Ferreira
+  jane.kovac@acme.com:
+    name: Jane Kovac
+  jane.moreno@acme.com:
+    name: Jane Moreno
+  jane.nowak@acme.com:
+    name: Jane Nowak
+  jane.petrov@acme.com:
+    name: Jane Petrov
+  jane.raman@acme.com:
+    name: Jane Raman
+  jane.tanaka@acme.com:
+    name: Jane Tanaka
+  jane.weber@acme.com:
+    name: Jane Weber
+  jonas.andersen@acme.com:
+    name: Jonas Andersen
+  jonas.berg@acme.com:
+    name: Jonas Berg
+  jonas.costa@acme.com:
+    name: Jonas Costa
+  jonas.doe@acme.com:
+    name: Jonas Doe
+  jonas.dubois@acme.com:
+    name: Jonas Dubois
+  jonas.eriksen@acme.com:
+    name: Jonas Eriksen
+  jonas.ferreira@acme.com:
+    name: Jonas Ferreira
+  jonas.haddad@acme.com:
+    name: Jonas Haddad
+  jonas.haq@acme.com:
+    name: Jonas Haq
+  jonas.kaur@acme.com:
+    name: Jonas Kaur
+  jonas.lindqvist@acme.com:
+    name: Jonas Lindqvist
+  jonas.moreau@acme.com:
+    name: Jonas Moreau
+  jonas.moreno@acme.com:
+    name: Jonas Moreno
+  jonas.nowak@acme.com:
+    name: Jonas Nowak
+  jonas.rossi@acme.com:
+    name: Jonas Rossi
+  jonas.vargas@acme.com:
+    name: Jonas Vargas
+  jonas.weber@acme.com:
+    name: Jonas Weber
+  kwame.andersen@acme.com:
+    name: Kwame Andersen
+  kwame.diallo@acme.com:
+    name: Kwame Diallo
+  kwame.doe@acme.com:
+    name: Kwame Doe
+  kwame.dubois@acme.com:
+    name: Kwame Dubois
+  kwame.eriksen@acme.com:
+    name: Kwame Eriksen
+  kwame.ferreira@acme.com:
+    name: Kwame Ferreira
+  kwame.haddad@acme.com:
+    name: Kwame Haddad
+  kwame.haq@acme.com:
+    name: Kwame Haq
+  kwame.kaur@acme.com:
+    name: Kwame Kaur
+  kwame.nowak@acme.com:
+    name: Kwame Nowak
+  kwame.petrov@acme.com:
+    name: Kwame Petrov
+  kwame.raman@acme.com:
+    name: Kwame Raman
+  kwame.santos@acme.com:
+    name: Kwame Santos
+  kwame.tanaka@acme.com:
+    name: Kwame Tanaka
+  lars.doe@acme.com:
+    name: Lars Doe
+  lars.dubois@acme.com:
+    name: Lars Dubois
+  lars.eriksen@acme.com:
+    name: Lars Eriksen
+  lars.ferreira@acme.com:
+    name: Lars Ferreira
+  lars.haq@acme.com:
+    name: Lars Haq
+  lars.jensen@acme.com:
+    name: Lars Jensen
+  lars.nowak@acme.com:
+    name: Lars Nowak
+  lars.okafor@acme.com:
+    name: Lars Okafor
+  lars.rossi@acme.com:
+    name: Lars Rossi
+  lars.santos@acme.com:
+    name: Lars Santos
+  lars.tanaka@acme.com:
+    name: Lars Tanaka
+  leila.costa@acme.com:
+    name: Leila Costa
+  leila.doe@acme.com:
+    name: Leila Doe
+  leila.dubois@acme.com:
+    name: Leila Dubois
+  leila.eriksen@acme.com:
+    name: Leila Eriksen
+  leila.ferreira@acme.com:
+    name: Leila Ferreira
+  leila.haddad@acme.com:
+    name: Leila Haddad
+  leila.kaur@acme.com:
+    name: Leila Kaur
+  leila.moreau@acme.com:
+    name: Leila Moreau
+  leila.petrov@acme.com:
+    name: Leila Petrov
+  leila.santos@acme.com:
+    name: Leila Santos
+  leila.tanaka@acme.com:
+    name: Leila Tanaka
+  leila.vargas@acme.com:
+    name: Leila Vargas
+  lena.andersen@acme.com:
+    name: Lena Andersen
+  lena.ceallaigh@acme.com:
+    name: Lena Ceallaigh
+  lena.costa@acme.com:
+    name: Lena Costa
+  lena.diallo@acme.com:
+    name: Lena Diallo
+  lena.doe@acme.com:
+    name: Lena Doe
+  lena.eriksen@acme.com:
+    name: Lena Eriksen
+  lena.haddad@acme.com:
+    name: Lena Haddad
+  lena.haq@acme.com:
+    name: Lena Haq
+  lena.moreno@acme.com:
+    name: Lena Moreno
+  lena.rossi@acme.com:
+    name: Lena Rossi
+  lena.santos@acme.com:
+    name: Lena Santos
+  lena.silva@acme.com:
+    name: Lena Silva
+  lena.tanaka@acme.com:
+    name: Lena Tanaka
+  lena.vargas@acme.com:
+    name: Lena Vargas
+  marta.andersen@acme.com:
+    name: Marta Andersen
+  marta.berg@acme.com:
+    name: Marta Berg
+  marta.costa@acme.com:
+    name: Marta Costa
+  marta.doe@acme.com:
+    name: Marta Doe
+  marta.dubois@acme.com:
+    name: Marta Dubois
+  marta.ferreira@acme.com:
+    name: Marta Ferreira
+  marta.jensen@acme.com:
+    name: Marta Jensen
+  marta.mensah@acme.com:
+    name: Marta Mensah
+  marta.moreau@acme.com:
+    name: Marta Moreau
+  marta.moreno@acme.com:
+    name: Marta Moreno
+  marta.petrov@acme.com:
+    name: Marta Petrov
+  marta.raman@acme.com:
+    name: Marta Raman
+  marta.rossi@acme.com:
+    name: Marta Rossi
+  marta.santos@acme.com:
+    name: Marta Santos
+  marta.silva@acme.com:
+    name: Marta Silva
+  marta.vargas@acme.com:
+    name: Marta Vargas
+  marta.weber@acme.com:
+    name: Marta Weber
+  mei.andersen@acme.com:
+    name: Mei Andersen
+  mei.berg@acme.com:
+    name: Mei Berg
+  mei.bianchi@acme.com:
+    name: Mei Bianchi
+  mei.costa@acme.com:
+    name: Mei Costa
+  mei.doe@acme.com:
+    name: Mei Doe
+  mei.haddad@acme.com:
+    name: Mei Haddad
+  mei.jensen@acme.com:
+    name: Mei Jensen
+  mei.kaur@acme.com:
+    name: Mei Kaur
+  mei.moreno@acme.com:
+    name: Mei Moreno
+  mei.novak@acme.com:
+    name: Mei Novak
+  mei.raman@acme.com:
+    name: Mei Raman
+  mei.tanaka@acme.com:
+    name: Mei Tanaka
+  mei.vargas@acme.com:
+    name: Mei Vargas
+  mei.weber@acme.com:
+    name: Mei Weber
+  miguel.bianchi@acme.com:
+    name: Miguel Bianchi
+  miguel.ceallaigh@acme.com:
+    name: Miguel Ceallaigh
+  miguel.costa@acme.com:
+    name: Miguel Costa
+  miguel.doe@acme.com:
+    name: Miguel Doe
+  miguel.dubois@acme.com:
+    name: Miguel Dubois
+  miguel.eriksen@acme.com:
+    name: Miguel Eriksen
+  miguel.jensen@acme.com:
+    name: Miguel Jensen
+  miguel.kaur@acme.com:
+    name: Miguel Kaur
+  miguel.mensah@acme.com:
+    name: Miguel Mensah
+  miguel.moreno@acme.com:
+    name: Miguel Moreno
+  miguel.novak@acme.com:
+    name: Miguel Novak
+  miguel.nowak@acme.com:
+    name: Miguel Nowak
+  miguel.raman@acme.com:
+    name: Miguel Raman
+  miguel.rossi@acme.com:
+    name: Miguel Rossi
+  miguel.santos@acme.com:
+    name: Miguel Santos
+  miguel.tanaka@acme.com:
+    name: Miguel Tanaka
+  nils.bianchi@acme.com:
+    name: Nils Bianchi
+  nils.ceallaigh@acme.com:
+    name: Nils Ceallaigh
+  nils.eriksen@acme.com:
+    name: Nils Eriksen
+  nils.ferreira@acme.com:
+    name: Nils Ferreira
+  nils.haddad@acme.com:
+    name: Nils Haddad
+  nils.haq@acme.com:
+    name: Nils Haq
+  nils.jensen@acme.com:
+    name: Nils Jensen
+  nils.lindqvist@acme.com:
+    name: Nils Lindqvist
+  nils.moreno@acme.com:
+    name: Nils Moreno
+  nils.novak@acme.com:
+    name: Nils Novak
+  nils.okafor@acme.com:
+    name: Nils Okafor
+  nils.rossi@acme.com:
+    name: Nils Rossi
+  nils.santos@acme.com:
+    name: Nils Santos
+  nils.silva@acme.com:
+    name: Nils Silva
+  nils.vargas@acme.com:
+    name: Nils Vargas
+  noor.andersen@acme.com:
+    name: Noor Andersen
+  noor.ceallaigh@acme.com:
+    name: Noor Ceallaigh
+  noor.costa@acme.com:
+    name: Noor Costa
+  noor.haq@acme.com:
+    name: Noor Haq
+  noor.jensen@acme.com:
+    name: Noor Jensen
+  noor.kovac@acme.com:
+    name: Noor Kovac
+  noor.mensah@acme.com:
+    name: Noor Mensah
+  noor.novak@acme.com:
+    name: Noor Novak
+  noor.okafor@acme.com:
+    name: Noor Okafor
+  noor.raman@acme.com:
+    name: Noor Raman
+  noor.rossi@acme.com:
+    name: Noor Rossi
+  noor.silva@acme.com:
+    name: Noor Silva
+  noor.weber@acme.com:
+    name: Noor Weber
+  omar.andersen@acme.com:
+    name: Omar Andersen
+  omar.costa@acme.com:
+    name: Omar Costa
+  omar.eriksen@acme.com:
+    name: Omar Eriksen
+  omar.haq@acme.com:
+    name: Omar Haq
+  omar.jensen@acme.com:
+    name: Omar Jensen
+  omar.lindqvist@acme.com:
+    name: Omar Lindqvist
+  omar.moreno@acme.com:
+    name: Omar Moreno
+  omar.novak@acme.com:
+    name: Omar Novak
+  omar.nowak@acme.com:
+    name: Omar Nowak
+  omar.rossi@acme.com:
+    name: Omar Rossi
+  pedro.andersen@acme.com:
+    name: Pedro Andersen
+  pedro.bianchi@acme.com:
+    name: Pedro Bianchi
+  pedro.ceallaigh@acme.com:
+    name: Pedro Ceallaigh
+  pedro.costa@acme.com:
+    name: Pedro Costa
+  pedro.diallo@acme.com:
+    name: Pedro Diallo
+  pedro.ferreira@acme.com:
+    name: Pedro Ferreira
+  pedro.haddad@acme.com:
+    name: Pedro Haddad
+  pedro.jensen@acme.com:
+    name: Pedro Jensen
+  pedro.kaur@acme.com:
+    name: Pedro Kaur
+  pedro.mensah@acme.com:
+    name: Pedro Mensah
+  pedro.moreau@acme.com:
+    name: Pedro Moreau
+  pedro.moreno@acme.com:
+    name: Pedro Moreno
+  pedro.novak@acme.com:
+    name: Pedro Novak
+  pedro.petrov@acme.com:
+    name: Pedro Petrov
+  pedro.rossi@acme.com:
+    name: Pedro Rossi
+  pedro.santos@acme.com:
+    name: Pedro Santos
+  pedro.tanaka@acme.com:
+    name: Pedro Tanaka
+  pedro.vargas@acme.com:
+    name: Pedro Vargas
+  priya.ceallaigh@acme.com:
+    name: Priya Ceallaigh
+  priya.diallo@acme.com:
+    name: Priya Diallo
+  priya.doe@acme.com:
+    name: Priya Doe
+  priya.eriksen@acme.com:
+    name: Priya Eriksen
+  priya.ferreira@acme.com:
+    name: Priya Ferreira
+  priya.haq@acme.com:
+    name: Priya Haq
+  priya.kovac@acme.com:
+    name: Priya Kovac
+  priya.novak@acme.com:
+    name: Priya Novak
+  priya.raman@acme.com:
+    name: Priya Raman
+  priya.rossi@acme.com:
+    name: Priya Rossi
+  rafael.costa@acme.com:
+    name: Rafael Costa
+  rafael.eriksen@acme.com:
+    name: Rafael Eriksen
+  rafael.haq@acme.com:
+    name: Rafael Haq
+  rafael.jensen@acme.com:
+    name: Rafael Jensen
+  rafael.kovac@acme.com:
+    name: Rafael Kovac
+  rafael.mensah@acme.com:
+    name: Rafael Mensah
+  rafael.moreno@acme.com:
+    name: Rafael Moreno
+  rafael.nowak@acme.com:
+    name: Rafael Nowak
+  rafael.rossi@acme.com:
+    name: Rafael Rossi
+  rafael.santos@acme.com:
+    name: Rafael Santos
+  rafael.vargas@acme.com:
+    name: Rafael Vargas
+  rafael.weber@acme.com:
+    name: Rafael Weber
+  samir.berg@acme.com:
+    name: Samir Berg
+  samir.diallo@acme.com:
+    name: Samir Diallo
+  samir.doe@acme.com:
+    name: Samir Doe
+  samir.haq@acme.com:
+    name: Samir Haq
+  samir.jensen@acme.com:
+    name: Samir Jensen
+  samir.kovac@acme.com:
+    name: Samir Kovac
+  samir.mensah@acme.com:
+    name: Samir Mensah
+  samir.nowak@acme.com:
+    name: Samir Nowak
+  samir.okafor@acme.com:
+    name: Samir Okafor
+  samir.petrov@acme.com:
+    name: Samir Petrov
+  samir.raman@acme.com:
+    name: Samir Raman
+  samir.silva@acme.com:
+    name: Samir Silva
+  samir.vargas@acme.com:
+    name: Samir Vargas
+  samir.weber@acme.com:
+    name: Samir Weber
+  sanne.andersen@acme.com:
+    name: Sanne Andersen
+  sanne.bianchi@acme.com:
+    name: Sanne Bianchi
+  sanne.ceallaigh@acme.com:
+    name: Sanne Ceallaigh
+  sanne.dubois@acme.com:
+    name: Sanne Dubois
+  sanne.eriksen@acme.com:
+    name: Sanne Eriksen
+  sanne.haddad@acme.com:
+    name: Sanne Haddad
+  sanne.jensen@acme.com:
+    name: Sanne Jensen
+  sanne.kaur@acme.com:
+    name: Sanne Kaur
+  sanne.lindqvist@acme.com:
+    name: Sanne Lindqvist
+  sanne.moreau@acme.com:
+    name: Sanne Moreau
+  sanne.moreno@acme.com:
+    name: Sanne Moreno
+  sanne.petrov@acme.com:
+    name: Sanne Petrov
+  sanne.raman@acme.com:
+    name: Sanne Raman
+  sanne.rossi@acme.com:
+    name: Sanne Rossi
+  sanne.santos@acme.com:
+    name: Sanne Santos
+  sanne.silva@acme.com:
+    name: Sanne Silva
+  sanne.tanaka@acme.com:
+    name: Sanne Tanaka
+  sanne.vargas@acme.com:
+    name: Sanne Vargas
+  sanne.weber@acme.com:
+    name: Sanne Weber
+  sofia.berg@acme.com:
+    name: Sofia Berg
+  sofia.costa@acme.com:
+    name: Sofia Costa
+  sofia.diallo@acme.com:
+    name: Sofia Diallo
+  sofia.haddad@acme.com:
+    name: Sofia Haddad
+  sofia.haq@acme.com:
+    name: Sofia Haq
+  sofia.kaur@acme.com:
+    name: Sofia Kaur
+  sofia.lindqvist@acme.com:
+    name: Sofia Lindqvist
+  sofia.mensah@acme.com:
+    name: Sofia Mensah
+  sofia.moreno@acme.com:
+    name: Sofia Moreno
+  sofia.nowak@acme.com:
+    name: Sofia Nowak
+  sofia.okafor@acme.com:
+    name: Sofia Okafor
+  sofia.petrov@acme.com:
+    name: Sofia Petrov
+  sofia.raman@acme.com:
+    name: Sofia Raman
+  sofia.santos@acme.com:
+    name: Sofia Santos
+  sofia.weber@acme.com:
+    name: Sofia Weber
+  tariq.andersen@acme.com:
+    name: Tariq Andersen
+  tariq.berg@acme.com:
+    name: Tariq Berg
+  tariq.dubois@acme.com:
+    name: Tariq Dubois
+  tariq.eriksen@acme.com:
+    name: Tariq Eriksen
+  tariq.ferreira@acme.com:
+    name: Tariq Ferreira
+  tariq.haddad@acme.com:
+    name: Tariq Haddad
+  tariq.kovac@acme.com:
+    name: Tariq Kovac
+  tariq.lindqvist@acme.com:
+    name: Tariq Lindqvist
+  tariq.mensah@acme.com:
+    name: Tariq Mensah
+  tariq.moreau@acme.com:
+    name: Tariq Moreau
+  tariq.novak@acme.com:
+    name: Tariq Novak
+  tariq.nowak@acme.com:
+    name: Tariq Nowak
+  tariq.petrov@acme.com:
+    name: Tariq Petrov
+  tariq.raman@acme.com:
+    name: Tariq Raman
+  tariq.rossi@acme.com:
+    name: Tariq Rossi
+  tariq.silva@acme.com:
+    name: Tariq Silva
+  tom.andersen@acme.com:
+    name: Tom Andersen
+  tom.costa@acme.com:
+    name: Tom Costa
+  tom.eriksen@acme.com:
+    name: Tom Eriksen
+  tom.haddad@acme.com:
+    name: Tom Haddad
+  tom.haq@acme.com:
+    name: Tom Haq
+  tom.jensen@acme.com:
+    name: Tom Jensen
+  tom.kaur@acme.com:
+    name: Tom Kaur
+  tom.kovac@acme.com:
+    name: Tom Kovac
+  tom.lindqvist@acme.com:
+    name: Tom Lindqvist
+  tom.novak@acme.com:
+    name: Tom Novak
+  tom.okafor@acme.com:
+    name: Tom Okafor
+  tom.petrov@acme.com:
+    name: Tom Petrov
+  tom.rossi@acme.com:
+    name: Tom Rossi
+  tom.silva@acme.com:
+    name: Tom Silva
+  viktor.andersen@acme.com:
+    name: Viktor Andersen
+  viktor.berg@acme.com:
+    name: Viktor Berg
+  viktor.bianchi@acme.com:
+    name: Viktor Bianchi
+  viktor.ceallaigh@acme.com:
+    name: Viktor Ceallaigh
+  viktor.costa@acme.com:
+    name: Viktor Costa
+  viktor.diallo@acme.com:
+    name: Viktor Diallo
+  viktor.doe@acme.com:
+    name: Viktor Doe
+  viktor.haddad@acme.com:
+    name: Viktor Haddad
+  viktor.kaur@acme.com:
+    name: Viktor Kaur
+  viktor.lindqvist@acme.com:
+    name: Viktor Lindqvist
+  viktor.mensah@acme.com:
+    name: Viktor Mensah
+  viktor.raman@acme.com:
+    name: Viktor Raman
+  viktor.rossi@acme.com:
+    name: Viktor Rossi
+  viktor.santos@acme.com:
+    name: Viktor Santos
+  viktor.silva@acme.com:
+    name: Viktor Silva
+  viktor.weber@acme.com:
+    name: Viktor Weber
+  yuki.berg@acme.com:
+    name: Yuki Berg
+  yuki.ceallaigh@acme.com:
+    name: Yuki Ceallaigh
+  yuki.doe@acme.com:
+    name: Yuki Doe
+  yuki.dubois@acme.com:
+    name: Yuki Dubois
+  yuki.eriksen@acme.com:
+    name: Yuki Eriksen
+  yuki.ferreira@acme.com:
+    name: Yuki Ferreira
+  yuki.haddad@acme.com:
+    name: Yuki Haddad
+  yuki.haq@acme.com:
+    name: Yuki Haq
+  yuki.kovac@acme.com:
+    name: Yuki Kovac
+  yuki.lindqvist@acme.com:
+    name: Yuki Lindqvist
+  yuki.moreno@acme.com:
+    name: Yuki Moreno
+  yuki.novak@acme.com:
+    name: Yuki Novak
+  yuki.tanaka@acme.com:
+    name: Yuki Tanaka
+  yuki.vargas@acme.com:
+    name: Yuki Vargas
+  yuki.weber@acme.com:
+    name: Yuki Weber

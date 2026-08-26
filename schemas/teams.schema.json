@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/belaboros/OrgChartGenerator/schemas/teams.schema.json",
+  "title": "OrgChartGenerator teams file (v1)",
+  "description": "Structure of an organization: nested Teams containing Positions. Strict: unknown keys are errors at every level.",
+  "type": "object",
+  "required": ["org", "version"],
+  "additionalProperties": false,
+  "properties": {
+    "org": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Name of the organization. Forms the root segment of every Path.",
+      "pattern": "^[^/]+$"
+    },
+    "version": {
+      "const": 1,
+      "description": "Format version. A file of a later version will not validate against this schema."
+    },
+    "teams": { "$ref": "#/$defs/teamMap" }
+  },
+  "$defs": {
+    "teamMap": {
+      "type": "object",
+      "description": "Teams keyed by name. A name may not contain '/', which joins Path segments.",
+      "propertyNames": { "pattern": "^[^/]+$" },
+      "additionalProperties": { "$ref": "#/$defs/team" }
+    },
+    "team": {
+      "type": "object",
+      "description": "A Team. May contain sub-Teams, Positions, both, or neither.",
+      "additionalProperties": false,
+      "properties": {
+        "teams": { "$ref": "#/$defs/teamMap" },
+        "positions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/position" }
+        }
+      }
+    },
+    "position": {
+      "type": "object",
+      "description": "A single seat within a Team. Vacant when 'occupant' is absent.",
+      "required": ["title"],
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[^/]+$",
+          "description": "Job title. May not contain '/'. Need not be unique within a Team."
+        },
+        "occupant": {
+          "type": "string",
+          "description": "Email of the Employee filling this Position. Not checked against the employees file."
+        },
+        "description": { "type": "string" }
+      }
+    }
+  }
+}

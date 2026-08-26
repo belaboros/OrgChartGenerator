@@ -1,0 +1,45 @@
+# yaml-language-server: $schema=./schemas/employees.schema.json
+org: ACME
+version: 1
+
+employees:
+  dana@acme.com:
+    name: Dana Okafor
+
+  miguel@acme.com:
+    name: Miguel Santos
+    location: Lisbon
+
+  priya@acme.com:
+    name: Priya Raman
+    location: Berlin
+    languages: [en, de, ta]
+
+  jane@acme.com:
+    name: Jane Doe
+    location: Berlin
+    skills: [go, k8s, postgres]
+    emergency:
+      contact: Sam Doe
+      phone: "+49 30 123456"
+
+  tom@acme.com:
+    name: Tom Ceallaigh
+
+  lars@acme.com:
+    name: Lars Eriksen
+    location: Copenhagen
+
+  amina@acme.com:
+    name: Amina Diallo
+    location: Dakar
+    skills: [terraform, aws]
+
+  kwame@acme.com:
+    name: Kwame Mensah
+
+  # Declared before a seat exists for them: valid, since an Employee
+  # need not occupy any Position.
+  noor@acme.com:
+    name: Noor Haddad
+    starts: 2026-09-15
