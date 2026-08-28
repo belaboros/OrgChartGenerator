@@ -1,5 +1,6 @@
 node_modules/
 dist/
+.vite/
 
 # One-off verification scripts and their output. These produced the numbers in the
 # ticket resolutions (#25-#31), but they are pinned to a fixed port and the dev
