@@ -43,8 +43,8 @@ toolchain to deliver the icon and nothing else.
 |---|---|
 | **Arrangement** | `nested` — a Team drawn as a shape containing its child Teams — or `tree` |
 | **tree options** | `direction`: `left-to-right`, `top-to-bottom`, `radial` — plus *pack subtrees to fit the window* |
-| **nested options** | `wrap`: `fit` (matches your window), `left-to-right-then-top-to-bottom`, `top-to-bottom-then-left-to-right` — plus *minimize area* (not implemented yet; the workbench says so when you set it) |
-| **Shape** | rectangle or ellipse — one for the whole View, not per layer |
+| **nested options** | `wrap`: `fit` (matches your window), `left-to-right-then-top-to-bottom`, `top-to-bottom-then-left-to-right` — plus *reorder Teams to fill rows*, which packs rows evenly at the cost of file order (not offered under `ellipse`, which reorders anyway) |
+| **Shape** | rectangle or ellipse — one for the whole View, not per layer. Under `ellipse`, child Teams are packed **inside** the curve rather than in a box behind it, so an ellipse diagram is markedly larger — around 6x the area on `acme-large` |
 | **Detail** | show Positions, show Occupant names, show per-Team counts — independent switches |
 | **Filter** | choose which Roles appear. This is what makes a 100-Team organization readable |
 | **Style** | two cascades by nesting depth, Role, Occupant and vacancy |

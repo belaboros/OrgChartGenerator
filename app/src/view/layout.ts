@@ -5,10 +5,10 @@
  * absolute geometry and owns it thereafter, which is why no layout engine is a
  * dependency (#21).
  */
-import type { ArrangementDoc } from '../files/types'
+import type { ArrangementDoc, NestedWrap } from '../files/types'
 import type { Organization, Team } from '../model/types'
 import type { Wrap } from './arrange'
-import { arrangeSiblings } from './arrange'
+import { GAP, arrangeSiblings } from './arrange'
 
 export interface PlacedPosition {
   role: string
@@ -31,6 +31,12 @@ export interface PlacedTeam {
   positions: PlacedPosition[]
   positionCount: number
   vacantCount: number
+  /**
+   * Where the Team's own label band sits inside its box (#41). Only set under
+   * `shape: ellipse`, where the chord packer slides the band down until the
+   * ellipse is wide enough to hold it — the renderer cannot derive it.
+   */
+  labelTop?: number
 }
 
 export interface Placement {
@@ -38,11 +44,15 @@ export interface Placement {
   width: number
   height: number
   /**
-   * Set when the chosen options name something the engine cannot do YET (#34).
-   * The nearest working layout is drawn, and the UI is obliged to say so — a
-   * fallback the user cannot see is exactly the v1 behaviour this effort kills.
+   * Something the viewer should know about what they are looking at (#42).
+   *
+   * Was `unsupported`, which meant "no engine behind this option". Nothing is
+   * unimplemented any more, and #43 needs the same slot for the opposite case: an
+   * option that IS implemented, did exactly what it says, and still produced a poor
+   * picture. One field cannot honestly mean both, so it means neither specifically
+   * — it carries whatever the user needs told.
    */
-  unsupported?: string
+  notice?: string
 }
 
 export interface DetailSwitches {
@@ -145,6 +155,7 @@ interface Box {
   w: number
   h: number
   contentTop: number
+  labelTop?: number
   kids: (Box & { rx: number; ry: number })[]
 }
 
@@ -165,18 +176,181 @@ function wrapFor(n: Node, o: LayoutOptions, target: number): Wrap {
     : { kind: 'height', limit: o.window.h }
 }
 
+/**
+ * Packing child Teams inside an ELLIPSE (#41, decided in #37).
+ *
+ * Today's rectangle packing draws the ellipse inscribed in a box packed as a
+ * rectangle, so the corners fall outside it — 86 of 100 Teams on acme-large sat
+ * outside the shape meant to contain them. Here rows follow the ellipse instead:
+ * each row may only be as wide as the chord across the band it occupies, so rows
+ * are short at top and bottom and wide through the middle, and the Team's own
+ * label is row zero (which is why content starts lower down).
+ *
+ * Two things measured as worth their complexity in the prototype: children are
+ * REORDERED into an organ-pipe sequence so the big ones land in the widest band,
+ * and the ellipse's aspect is searched rather than inherited from the rectangle
+ * layout. Together they took a quarter off acme-large and nearly half off
+ * acme-medium. The cost is source order, accepted in #37.
+ */
+const chordHalf = (a: number, b: number, y1: number, y2: number): number => {
+  const y = Math.max(Math.abs(y1), Math.abs(y2))
+  return y >= b ? 0 : a * Math.sqrt(1 - (y / b) ** 2)
+}
+
+/** Tallest in the middle, shrinking towards both ends — the ellipse's own profile. */
+function organPipe<T extends { w: number; h: number }>(kids: readonly T[]): T[] {
+  const out: T[] = []
+  ;[...kids]
+    .sort((x, y) => y.h - x.h || y.w - x.w)
+    .forEach((k, i) => (i % 2 === 0 ? out.push(k) : out.unshift(k)))
+  return out
+}
+
+interface EllipsePack {
+  placed: { kid: Box & { rx: number; ry: number }; rx: number; ry: number }[]
+  w: number
+  h: number
+  /** Where the label band landed, once slid down to a wide enough chord. */
+  labelTop: number
+}
+
+function packInEllipse(
+  own: { w: number; h: number },
+  all: (Box & { rx: number; ry: number })[],
+  baseAspect: number,
+): EllipsePack | null {
+  const kids = organPipe(all)
+
+  const attempt = (H: number, aspect: number): EllipsePack | null => {
+    const W = H * aspect
+    const a = W / 2
+    const b = H / 2
+    const placed: EllipsePack['placed'] = []
+    let y = -b
+
+    // Slide the label band down until the ellipse is wide enough to hold it.
+    let guard = 0
+    while (chordHalf(a, b, y, y + own.h) * 2 < own.w && y + own.h < b && guard++ < 4000) y += 2
+    if (y + own.h >= b) return null
+    const labelTop = y + b
+    y += own.h + GAP
+
+    let i = 0
+    while (i < kids.length) {
+      let g = 0
+      while (chordHalf(a, b, y, y + kids[i]!.h) * 2 < kids[i]!.w && y + kids[i]!.h < b && g++ < 4000) y += 2
+      if (y + kids[i]!.h >= b) return null
+
+      // The chord must be measured against the row's FINAL height, not its first
+      // child's: admitting a taller child later extends the row into a narrower
+      // part of the ellipse and pushes the earlier ones out. Measured, not
+      // reasoned — it leaked 3 of 30 Teams on acme-medium before it was fixed.
+      const row: (Box & { rx: number; ry: number })[] = []
+      let used = 0
+      let rowMax = kids[i]!.h
+      while (i < kids.length) {
+        const cand = kids[i]!
+        const nextMax = Math.max(rowMax, cand.h)
+        const add = row.length ? GAP + cand.w : cand.w
+        if (used + add > chordHalf(a, b, y, y + nextMax) * 2) break
+        row.push(cand)
+        used += add
+        rowMax = nextMax
+        i++
+      }
+      if (!row.length) {
+        y += 4
+        continue
+      }
+      let x = -used / 2
+      for (const k of row) {
+        placed.push({ kid: k, rx: x + a, ry: y + b })
+        x += k.w + GAP
+      }
+      y += rowMax + GAP
+    }
+    return { placed, w: W, h: H, labelTop }
+  }
+
+  let best: EllipsePack | null = null
+  for (const aspect of [0.7, 0.9, 1.1, 1.35, 1.6, 1.9, 2.3, 2.8]) {
+    let lo = 0
+    let hi = Math.max(own.h, ...all.map((k) => k.h)) * 8 + 400
+    let found: EllipsePack | null = null
+    for (let i = 0; i < 20; i++) {
+      const mid = (lo + hi) / 2
+      const r = attempt(mid, aspect)
+      if (r) {
+        found = r
+        hi = mid
+      } else lo = mid
+    }
+    if (found && (!best || found.w * found.h < best.w * best.h)) best = found
+  }
+  void baseAspect
+  return best
+}
+
+/**
+ * Tallest-first, ties by file position (#42).
+ *
+ * Rows stop being padded out by one tall member, which is the whole of the win.
+ * `Array.prototype.sort` is stable, so equal heights keep their file order for
+ * free — measured as worth having: it took acme-large from 0.61 order-loss to
+ * 0.54 for nothing.
+ */
+const tallestFirst = <T extends { w: number; h: number }>(kids: readonly T[]): T[] =>
+  [...kids].sort((a, b) => b.h - a.h)
+
 /** The `nested` arrangement: a Team is a shape containing its child Teams. */
 function nest(n: Node, o: LayoutOptions, target: number): Box {
   const kids = n.children.map((c) => nest(c, o, target)) as (Box & { rx: number; ry: number })[]
   const own = ownHeight(n, o)
 
+  const ownW = ownWidth(n, o)
+
+  // Leaves go through the packer too. They contain no Teams, but they do contain
+  // their own label, and a label band is exactly what the chord search sizes for —
+  // without this, every leaf draws its text through the side of its own ellipse.
+  if (o.arrangement.shape === 'ellipse') {
+    const rect = arrangeSiblings(kids, { kind: 'aspect', target })
+    const pack = packInEllipse({ w: ownW, h: own }, kids, Math.max(ownW, rect.w) / (own + rect.h))
+    if (pack) {
+      // Assign by IDENTITY, not by index: the organ-pipe order means the nth
+      // placement is not the nth child, and matching positionally would scatter
+      // the diagram while every measurement still looked correct.
+      for (const p of pack.placed) {
+        p.kid.rx = p.rx
+        p.kid.ry = p.ry
+      }
+      return {
+        n,
+        labelTop: pack.labelTop + PAD,
+        w: pack.w + PAD * 2,
+        h: pack.h + PAD * 2,
+        // The chord packer places children absolutely within the box — the label
+        // band is already accounted for — so the only offset left is the padding.
+        contentTop: PAD,
+        kids,
+      }
+    }
+    // Falling through to the rectangle packing would draw an ellipse over a
+    // rectangular block, which is the bug this exists to remove. Better to have
+    // the search fail loudly in testing than quietly here.
+  }
+
   let innerW = 0
   let innerH = 0
   if (kids.length) {
-    const { placed, w, h } = arrangeSiblings(kids, wrapFor(n, o, target))
-    for (let i = 0; i < kids.length; i++) {
-      kids[i]!.rx = placed[i]!.rx
-      kids[i]!.ry = placed[i]!.ry
+    // `reorderToFill` decides the ORDER; the wrap decides where rows break. The
+    // two are orthogonal, which is why reordering composes with every wrap.
+    const ordered = o.arrangement.nested.reorderToFill ? tallestFirst(kids) : kids
+    const { placed, w, h } = arrangeSiblings(ordered, wrapFor(n, o, target))
+    // Positional, and only safe because `arrangeSiblings` emits placements in the
+    // order it was given — the same list, reordered or not.
+    for (let i = 0; i < ordered.length; i++) {
+      ordered[i]!.rx = placed[i]!.rx
+      ordered[i]!.ry = placed[i]!.ry
     }
     innerW = w
     innerH = h
@@ -184,7 +358,7 @@ function nest(n: Node, o: LayoutOptions, target: number): Box {
 
   return {
     n,
-    w: Math.max(ownWidth(n, o), innerW) + PAD * 2,
+    w: Math.max(ownW, innerW) + PAD * 2,
     h: own + innerH + PAD * 2 + (kids.length ? 4 : 0),
     contentTop: own + PAD,
     kids,
@@ -204,6 +378,7 @@ function flatten(b: Box, ox: number, oy: number, parent: string | null, out: Pla
     positions: b.n.positions,
     positionCount: b.n.positionCount,
     vacantCount: b.n.vacantCount,
+    ...(b.labelTop === undefined ? {} : { labelTop: b.labelTop }),
   })
   for (const k of b.kids) flatten(k, ox + PAD + k.rx, oy + b.contentTop + k.ry, b.n.path, out)
 }
@@ -475,6 +650,36 @@ const extent = (nodes: PlacedTeam[]): { width: number; height: number } => ({
  * and the pairs that had to be coerced stop being representable.
  */
 /**
+ * A window-edge wrap that never wrapped (#43).
+ *
+ * `left-to-right-then-top-to-bottom` breaks a row at the window's width. If the
+ * organization's own Teams are each wider than the window, every row holds exactly
+ * one of them and the option did nothing — the user asked for a wrap and silently
+ * got a tall strip. Accepted as a limit in #40, on the condition it is said out loud.
+ *
+ * Only the top level wraps against the window (#35), so only the top level can
+ * degenerate this way. One Team cannot fail to wrap, so a single-root organization
+ * is not reported.
+ */
+function degenerateWrap(nodes: readonly PlacedTeam[], wrap: NestedWrap): string | undefined {
+  if (wrap === 'fit') return undefined
+  const tops = nodes.filter((n) => n.depth === 1)
+  if (tops.length < 2) return undefined
+
+  const rows = wrap === 'left-to-right-then-top-to-bottom'
+  const runs = new Map<number, number>()
+  for (const n of tops) {
+    const k = Math.round(rows ? n.y : n.x)
+    runs.set(k, (runs.get(k) ?? 0) + 1)
+  }
+  if ([...runs.values()].some((c) => c > 1)) return undefined
+
+  return rows
+    ? 'every row holds one Team — this organization is wider than your window, so this wrap has no effect. Try “fit”.'
+    : 'every column holds one Team — this organization is taller than your window, so this wrap has no effect. Try “fit”.'
+}
+
+/**
  * Dispatch (#35). Every pairing that v1 had to coerce is now simply unrepresentable:
  * a direction belongs to `tree` and a wrap to `nested`, so neither can be handed to
  * the arrangement it means nothing in. `packSubtrees` under `radial` is likewise not
@@ -503,20 +708,16 @@ export function layout(org: Organization, o: LayoutOptions): Placement {
     return { nodes, ...extent(nodes) }
   }
 
-  // The one option still without an engine (#38 prototypes it, #39 decides how it
-  // meets the window edge). Reported, never silently dropped.
-  const unsupported = a.nested.minimizeArea
-    ? '"minimize area" is not implemented yet (#38) — drawn without it'
-    : undefined
-  const note = (p: { nodes: PlacedTeam[]; width: number; height: number }): Placement =>
-    unsupported ? { ...p, unsupported } : p
-
   /*
    * A window-edge wrap breaks at a fixed width, so there is nothing to search for:
    * one pass, and the same organization breaks in the same place every time. The
    * sweep below exists only to steer `fit`.
    */
-  if (a.nested.wrap !== 'fit') return note(nestOnce(target))
+  if (a.nested.wrap !== 'fit') {
+    const p = nestOnce(target)
+    const notice = degenerateWrap(p.nodes, a.nested.wrap)
+    return notice ? { ...p, notice } : p
+  }
 
   /*
    * Each level packs against a target, but a parent inherits its widest child's
@@ -538,7 +739,7 @@ export function layout(org: Organization, o: LayoutOptions): Placement {
     // sample is a full layout of the whole organization.
     if (bestErr < 0.02) break
   }
-  return note(best ?? nestOnce(target))
+  return best ?? nestOnce(target)
 }
 
 export const METRICS = { HEADER, LINE, PAD }

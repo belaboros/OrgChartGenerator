@@ -43,7 +43,7 @@ export const DEFAULT_ARRANGEMENT: ArrangementDoc = {
   active: 'nested',
   shape: 'rectangle',
   tree: { direction: 'left-to-right', packSubtrees: true },
-  nested: { wrap: 'fit', minimizeArea: false },
+  nested: { wrap: 'fit', reorderToFill: false },
 }
 
 /** No `shape` (#34): it left the cascade and became `arrangement.shape`. */
@@ -113,7 +113,7 @@ export function toViewDoc(org: string, state: ViewState): ViewDoc {
 
   const doc: ViewDoc = {
     org,
-    version: 2,
+    version: 3,
     arrangement: state.arrangement,
     detail: state.detail,
     // Absent means every Role (#18); only written when it actually narrows. In
@@ -174,7 +174,7 @@ function readArrangement(v: unknown): ArrangementDoc {
   const tree = asObject(o['tree'], 'arrangement.tree')
   onlyKeys(tree, ['direction', 'packSubtrees'], 'arrangement.tree')
   const nested = asObject(o['nested'], 'arrangement.nested')
-  onlyKeys(nested, ['wrap', 'minimizeArea'], 'arrangement.nested')
+  onlyKeys(nested, ['wrap', 'reorderToFill'], 'arrangement.nested')
   return {
     active: oneOf(o['active'], ARRANGEMENTS, 'arrangement.active'),
     shape: oneOf(o['shape'], SHAPES, 'arrangement.shape'),
@@ -184,7 +184,7 @@ function readArrangement(v: unknown): ArrangementDoc {
     },
     nested: {
       wrap: oneOf(nested['wrap'], NESTED_WRAPS, 'arrangement.nested.wrap'),
-      minimizeArea: bool(nested['minimizeArea'], 'arrangement.nested.minimizeArea'),
+      reorderToFill: bool(nested['reorderToFill'], 'arrangement.nested.reorderToFill'),
     },
   }
 }
@@ -195,16 +195,18 @@ export function parseViewDoc(raw: unknown): ViewDoc {
   // The version gate runs FIRST. Checked after the key list, a v1 file is refused
   // for saying `encoding` — true, but useless: the reason it fails is its version,
   // and that is what the reader should say (#34).
-  if (o['version'] !== 2) {
-    // v1 is refused by NAME, not by a bare number mismatch: the reader knows
-    // exactly what a v1 file is and can say why it cannot open it (#34).
-    reject(
-      'version',
+  if (o['version'] !== 3) {
+    // Older versions are refused by NAME, not by a bare number mismatch: the reader
+    // knows what each one was and can say why it cannot open it (#34, #42).
+    const was =
       o['version'] === 1
-        ? 'this is a v1 view file. v1 is not supported — v2 replaced `encoding` with an ' +
-          'arrangement block carrying both tabs\' options and a global shape. Recreate the view.'
-        : `expected 2, found ${JSON.stringify(o['version'])}`,
-    )
+        ? 'this is a v1 view file. v1 named the arrangement `encoding`; v2 replaced it with an ' +
+          'arrangement block carrying both tabs\' options and a global shape.'
+        : o['version'] === 2
+          ? 'this is a v2 view file. v2\'s `arrangement.nested.minimizeArea` is now ' +
+            '`reorderToFill` — the option reorders Teams to fill rows, it does not minimise area.'
+          : null
+    reject('version', was ? `${was} Recreate the view.` : `expected 3, found ${JSON.stringify(o['version'])}`)
   }
 
   onlyKeys(o, ['org', 'version', 'arrangement', 'detail', 'filter', 'style', 'geometry'], 'file')
@@ -259,7 +261,7 @@ export function parseViewDoc(raw: unknown): ViewDoc {
 
   return {
     org: o['org'] as string,
-    version: 2,
+    version: 3,
     arrangement,
     detail: det as unknown as DetailSwitches,
     ...(filter ? { filter } : {}),

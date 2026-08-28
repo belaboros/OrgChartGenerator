@@ -320,7 +320,7 @@ export function Workbench({ org, files, onClose }: { org: Organization; files: F
       if (draft.tree.direction !== 'radial' && draft.tree.packSubtrees !== arrangement.tree.packSubtrees) n++
     } else {
       if (draft.nested.wrap !== arrangement.nested.wrap) n++
-      if (draft.nested.minimizeArea !== arrangement.nested.minimizeArea) n++
+      if (draft.shape !== 'ellipse' && draft.nested.reorderToFill !== arrangement.nested.reorderToFill) n++
     }
     return n
   }, [draft, arrangement])
@@ -379,14 +379,10 @@ export function Workbench({ org, files, onClose }: { org: Organization; files: F
         <span data-k="layout">layout {layoutMs.toFixed(1)} ms</span>
         <span data-k="fps">fps {fps ? fps.toFixed(0) : '—'}</span>
         <span data-k="worst">worst {Number.isFinite(worst) ? worst.toFixed(0) : '—'}</span>
-        {/*
-          Loud on purpose (#34): half the v2 option space has no engine behind it
-          until #35, and a fallback the user cannot see is the v1 defect this
-          effort exists to remove. The nearest working layout is drawn, and said so.
-        */}
-        {placement.unsupported && (
-          <span data-k="unsupported" style={S.warn}>
-            ⚠ {placement.unsupported}
+        {/* Anything the viewer should know about what they are looking at (#42). */}
+        {placement.notice && (
+          <span data-k="notice" style={S.warn}>
+            ⚠ {placement.notice}
           </span>
         )}
       </div>

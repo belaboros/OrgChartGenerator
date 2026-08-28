@@ -104,8 +104,15 @@ export interface ArrangementDoc {
   }
   nested: {
     wrap: NestedWrap
-    /** Reorders child Teams to pack them tightest. Source order is lost when true. */
-    minimizeArea: boolean
+    /**
+     * Reorders child Teams tallest-first so rows stop being padded out by one tall
+     * member (#42). NOT area minimisation, which is what it used to be called and
+     * what it turned out to do badly: minimising area alone produced a 706x7331
+     * tower on acme-large, rendering every shape at a third its size (#38). This
+     * keeps the wrap's own objective and only changes the ORDER. Source order is
+     * lost when true.
+     */
+    reorderToFill: boolean
   }
 }
 
@@ -149,11 +156,12 @@ export interface Geometry {
 export interface ViewDoc {
   org: string
   /**
-   * v2 (#34). v1 is REJECTED with a clear error, never upconverted: every v1 file
-   * in existence was in this repo and has been rewritten, so upconversion code
-   * would be permanent debt serving nobody.
+   * v3 (#42). Older versions are REJECTED BY NAME, never upconverted — a reader
+   * that knows what a v2 file is can say so, where a bare unknown-key error tells
+   * you nothing. That is why a key rename bumps the version rather than quietly
+   * changing what `version: 2` means.
    */
-  version: 2
+  version: 3
   arrangement: ArrangementDoc
   detail: {
     positions: boolean

@@ -115,11 +115,20 @@ export function ArrangePanel({
               ))}
             </select>
           </Row>
-          <Check
-            label="minimize area"
-            checked={draft.nested.minimizeArea}
-            onChange={(v) => onChange({ ...draft, nested: { ...draft.nested, minimizeArea: v } })}
-          />
+          {/*
+            Inapplicable under `ellipse` (#42): the ellipse packer reorders
+            unconditionally — organ-pipe ordering is how it fits children to the
+            curve — so the option has nothing left to do. Hidden rather than
+            offered-and-ignored, the same treatment `packSubtrees` gets under
+            `radial`. Hidden does NOT mean off: ellipse reorders regardless.
+          */}
+          {draft.shape !== 'ellipse' && (
+            <Check
+              label="reorder Teams to fill rows"
+              checked={draft.nested.reorderToFill}
+              onChange={(v) => onChange({ ...draft, nested: { ...draft.nested, reorderToFill: v } })}
+            />
+          )}
         </>
       )}
 

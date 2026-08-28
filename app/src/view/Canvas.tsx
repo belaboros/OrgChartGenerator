@@ -240,7 +240,8 @@ function TeamShape({
   onStartResize(path: string, e: React.PointerEvent): void
 }) {
   const s = resolveTeamStyle(style, node.depth, node.path)
-  const top = METRICS.HEADER + (detail.counts ? METRICS.LINE : 0)
+  const ellipse = shape === 'ellipse'
+  const top = (ellipse ? (node.labelTop ?? 0) + 4 : 0) + METRICS.HEADER + (detail.counts ? METRICS.LINE : 0)
   return (
     <g
       transform={`translate(${node.x},${node.y})`}
@@ -266,11 +267,28 @@ function TeamShape({
       ) : (
         <rect width={node.w} height={node.h} rx={4} fill={s.fill} stroke={s.line} strokeWidth={s.border} />
       )}
-      <text x={s.margin} y={6 + s.font} fontSize={s.font} fontWeight={600} fill={s.text}>
+      {/*
+        Inside an ellipse the top-left corner is outside the shape, so the label
+        goes on the centre line at the band the packer reserved for it (#41).
+      */}
+      <text
+        x={ellipse ? node.w / 2 : s.margin}
+        y={(ellipse ? (node.labelTop ?? 0) + 4 : 6) + s.font}
+        textAnchor={ellipse ? 'middle' : 'start'}
+        fontSize={s.font}
+        fontWeight={600}
+        fill={s.text}
+      >
         {node.name}
       </text>
       {detail.counts && (
-        <text x={s.margin} y={6 + s.font + 13} fontSize={10} fill="#70757a">
+        <text
+          x={ellipse ? node.w / 2 : s.margin}
+          y={(ellipse ? (node.labelTop ?? 0) + 4 : 6) + s.font + 13}
+          textAnchor={ellipse ? 'middle' : 'start'}
+          fontSize={10}
+          fill="#70757a"
+        >
           {node.positionCount} positions · {node.vacantCount} vacant
         </text>
       )}
@@ -279,10 +297,16 @@ function TeamShape({
         const y = top + i * METRICS.LINE
         return (
           <g key={i}>
-            {ps.fill !== 'transparent' && (
+            {ps.fill !== 'transparent' && !ellipse && (
               <rect x={6} y={y - 1} width={node.w - 12} height={METRICS.LINE} fill={ps.fill} />
             )}
-            <text x={s.margin + 2} y={y + ps.font} fontSize={ps.font} fill={ps.text}>
+            <text
+              x={ellipse ? node.w / 2 : s.margin + 2}
+              y={y + ps.font}
+              textAnchor={ellipse ? 'middle' : 'start'}
+              fontSize={ps.font}
+              fill={ps.text}
+            >
               {positionLabel(p, detail)}
             </text>
           </g>

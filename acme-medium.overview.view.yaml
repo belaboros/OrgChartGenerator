@@ -1,10 +1,10 @@
 org: ACME-medium
-version: 2
+version: 3
 arrangement:
   active: nested
   shape: rectangle
   tree: {direction: left-to-right, packSubtrees: true}
-  nested: {wrap: fit, minimizeArea: false}
+  nested: {wrap: fit, reorderToFill: false}
 detail:
   positions: true
   occupantNames: true
