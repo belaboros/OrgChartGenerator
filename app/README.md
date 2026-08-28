@@ -3,7 +3,7 @@
 An interactive tool for **finding the right visual representation** of an organization.
 
 It is not a renderer that produces one diagram. It exists so you can try the alternatives
-side by side — enclosure against node-link, five arrangements, two shapes, four levels of
+side by side — nested against tree, each with its own options, two shapes, four levels of
 detail — and keep the one that works.
 
 ```sh
@@ -41,9 +41,10 @@ toolchain to deliver the icon and nothing else.
 
 | | |
 |---|---|
-| **Encoding** | `enclosure` — a Team drawn as a shape containing its child Teams — or `node-link` |
-| **Arrangement** | `fit` (matches your window), `left-to-right`, `top-to-bottom`, `radial`, `grid-<cols>x<rows>` |
-| **Shape** | rectangle or circle, per cascade layer |
+| **Arrangement** | `nested` — a Team drawn as a shape containing its child Teams — or `tree` |
+| **tree options** | `direction`: `left-to-right`, `top-to-bottom`, `radial` — plus *pack subtrees to fit the window* |
+| **nested options** | `wrap`: `fit` (matches your window), `left-to-right-then-top-to-bottom`, `top-to-bottom-then-left-to-right` — plus *minimize area* (not implemented yet; the workbench says so when you set it) |
+| **Shape** | rectangle or ellipse — one for the whole View, not per layer |
 | **Detail** | show Positions, show Occupant names, show per-Team counts — independent switches |
 | **Filter** | choose which Roles appear. This is what makes a 100-Team organization readable |
 | **Style** | two cascades by nesting depth, Role, Occupant and vacancy |
@@ -54,9 +55,13 @@ toolchain to deliver the icon and nothing else.
 ## Arrange is a command, not a mode
 
 Choosing an arrangement places every shape once; you then own the layout. Move and resize
-whatever you like. Pressing **Arrange** again — or switching encoding or arrangement —
-recomputes everything and **discards hand-placed geometry**. It tells you how many shapes it
-is about to discard, and asks.
+whatever you like.
+
+The **Arrange** panel only ever holds a draft: switching tabs, changing a direction or a wrap,
+ticking a box, changing the shape — none of it touches the diagram. Browsing what the other
+arrangement offers is free. Pressing **Arrange** applies the draft, recomputes everything and
+**discards hand-placed geometry**; the panel says how many shapes that is beforehand, and the
+button asks before doing it. It is the one destructive control in the panel.
 
 Changing detail switches, the Role filter or styling does *not* discard anything: those
 change what a shape contains, not where it goes.

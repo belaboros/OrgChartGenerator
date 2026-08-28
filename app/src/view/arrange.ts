@@ -1,14 +1,15 @@
 /**
- * The five arrangements (#20), computed in our own code — no layout engine (#21).
+ * Sibling placement, computed in our own code — no layout engine (#21).
  *
  * Arrange is a COMMAND, not a mode: this runs once, hands back absolute geometry,
  * and the application owns it from then on. Nothing here re-runs until arrange is
- * pressed again.
+ * pressed again — including the window size, which is snapshotted when the command
+ * runs rather than tracked live (#35).
  *
- * Which arrangement applies to a set of siblings is chosen by the depth of those
- * siblings, through the same cascade shape as style: `teamDepth[d] ?? default`.
+ * v1 carried ONE union across both arrangements and coerced the pairs that made no
+ * sense. #35 replaced it with the three wrap modes below, which are the only ways a
+ * row of siblings can be broken.
  */
-import type { Arrangement } from '../files/types'
 
 export interface Sized {
   w: number
@@ -20,13 +21,39 @@ export interface Placed extends Sized {
   ry: number
 }
 
+/**
+ * How a run of siblings is broken.
+ *
+ * `aspect` SEARCHES for the break that lands closest to a target shape — it has no
+ * direction, which is exactly why `fit` is not spelled as one. The other two break
+ * at a fixed limit in world units, so the same organization breaks in the same
+ * place regardless of what else is on screen.
+ */
+export type Wrap =
+  | { kind: 'aspect'; target: number }
+  | { kind: 'width'; limit: number }
+  | { kind: 'height'; limit: number }
+
 export const GAP = 12
 
-const gridColumns = (a: Arrangement, n: number): number => {
-  const m = /^grid-(\d+)x(\d+)$/.exec(a)
-  if (m) return Math.max(1, Number(m[1]))
-  if (a === 'top-to-bottom') return 1
-  return n // left-to-right: one row
+/** Greedy break along one axis: start a new run when the next child would overflow. */
+function runs<T extends Sized>(kids: T[], limit: number, size: (k: T) => number): T[][] {
+  const out: T[][] = []
+  let run: T[] = []
+  let used = 0
+  for (const k of kids) {
+    const add = run.length ? GAP + size(k) : size(k)
+    if (run.length && used + add > limit) {
+      out.push(run)
+      run = [k]
+      used = size(k)
+    } else {
+      run.push(k)
+      used += add
+    }
+  }
+  if (run.length) out.push(run)
+  return out
 }
 
 /**
@@ -37,26 +64,11 @@ const gridColumns = (a: Arrangement, n: number): number => {
  * two of them wraps identically.
  */
 export function packToAspect<T extends Sized>(kids: T[], target: number): { rows: T[][]; w: number; h: number } {
-  const tryLimit = (limit: number): { rows: T[][]; w: number; h: number } => {
-    const rows: T[][] = []
-    let row: T[] = []
-    let rowW = 0
-    for (const k of kids) {
-      const add = row.length ? GAP + k.w : k.w
-      if (row.length && rowW + add > limit) {
-        rows.push(row)
-        row = [k]
-        rowW = k.w
-      } else {
-        row.push(k)
-        rowW += add
-      }
-    }
-    if (row.length) rows.push(row)
-    const w = Math.max(...rows.map((r) => r.reduce((a, k) => a + k.w + GAP, -GAP)))
-    const h = rows.reduce((a, r) => a + Math.max(...r.map((k) => k.h)) + GAP, -GAP)
-    return { rows, w, h }
-  }
+  const measure = (rows: T[][]): { rows: T[][]; w: number; h: number } => ({
+    rows,
+    w: Math.max(...rows.map((r) => r.reduce((a, k) => a + k.w + GAP, -GAP))),
+    h: rows.reduce((a, r) => a + Math.max(...r.map((k) => k.h)) + GAP, -GAP),
+  })
 
   const candidates = new Set<number>()
   for (let i = 0; i < kids.length; i++) {
@@ -72,10 +84,10 @@ export function packToAspect<T extends Sized>(kids: T[], target: number): { rows
     limits = Array.from({ length: 400 }, (_, i) => limits[Math.floor(i * step)]!)
   }
 
-  let best = tryLimit(limits[limits.length - 1] ?? 0)
+  let best = measure(runs(kids, limits[limits.length - 1] ?? 0, (k) => k.w))
   let bestErr = Number.POSITIVE_INFINITY
   for (const limit of limits) {
-    const r = tryLimit(limit)
+    const r = measure(runs(kids, limit, (k) => k.w))
     // Log space, so "twice too wide" and "twice too tall" are penalised equally.
     const err = Math.abs(Math.log(r.w / r.h / target))
     if (err < bestErr) {
@@ -86,24 +98,37 @@ export function packToAspect<T extends Sized>(kids: T[], target: number): { rows
   return best
 }
 
-/** Lays a set of sized siblings out in rows, returning offsets and the block size. */
+/** Lays a set of sized siblings out, returning offsets and the block they occupy. */
 export function arrangeSiblings<T extends Sized>(
   kids: T[],
-  arrangement: Arrangement,
-  targetAspect: number,
+  wrap: Wrap,
 ): { placed: (T & Placed)[]; w: number; h: number } {
   if (kids.length === 0) return { placed: [], w: 0, h: 0 }
 
-  let rows: T[][]
-  if (arrangement === 'fit') {
-    rows = packToAspect(kids, targetAspect).rows
-  } else {
-    const cols = Math.max(1, gridColumns(arrangement, kids.length))
-    rows = []
-    for (let i = 0; i < kids.length; i += cols) rows.push(kids.slice(i, i + cols))
+  const placed: (T & Placed)[] = []
+
+  // Columns flow DOWN and break to the right; rows flow across and break down.
+  // Everything else about the two is the same, transposed.
+  if (wrap.kind === 'height') {
+    const cols = runs(kids, wrap.limit, (k) => k.h)
+    let x = 0
+    let h = 0
+    for (const col of cols) {
+      let y = 0
+      const colW = Math.max(...col.map((k) => k.w))
+      for (const k of col) {
+        placed.push({ ...k, rx: x, ry: y })
+        y += k.h + GAP
+      }
+      h = Math.max(h, y - GAP)
+      x += colW + GAP
+    }
+    return { placed, w: Math.max(0, x - GAP), h }
   }
 
-  const placed: (T & Placed)[] = []
+  const rows =
+    wrap.kind === 'aspect' ? packToAspect(kids, wrap.target).rows : runs(kids, wrap.limit, (k) => k.w)
+
   let y = 0
   let w = 0
   for (const row of rows) {
@@ -117,11 +142,4 @@ export function arrangeSiblings<T extends Sized>(
     y += rowH + GAP
   }
   return { placed, w, h: Math.max(0, y - GAP) }
-}
-
-export function arrangementFor(
-  cascade: { default: Arrangement; teamDepth?: Record<number, Arrangement> },
-  childDepth: number,
-): Arrangement {
-  return cascade.teamDepth?.[childDepth] ?? cascade.default
 }

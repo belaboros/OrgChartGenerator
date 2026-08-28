@@ -1,8 +1,10 @@
 org: ACME-small
-version: 1
-encoding: enclosure
+version: 2
 arrangement:
-  default: fit
+  active: nested
+  shape: rectangle
+  tree: {direction: left-to-right, packSubtrees: true}
+  nested: {wrap: fit, minimizeArea: false}
 detail:
   positions: true
   occupantNames: true

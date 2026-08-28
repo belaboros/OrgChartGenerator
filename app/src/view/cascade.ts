@@ -6,6 +6,8 @@
  * other — a single eight-layer list conflated them.
  *
  *   Team shapes:     team -> org -> teamDepth.<n> -> shape.<path>
+ *                    (`shape.<path>` is keyed by Team Path — since #34 removed the
+ *                     `shape` PROPERTY, that name means only this layer)
  *   Position labels: position -> role.<Role> -> occupant.<email> -> vacant
  *
  * Later layers win.
@@ -19,7 +21,6 @@ export interface ResolvedTeamStyle extends Required<TeamStyle> {}
 export interface ResolvedPositionStyle extends Required<PositionStyle> {}
 
 export const BASE_TEAM: ResolvedTeamStyle = {
-  shape: 'rectangle',
   fill: '#ffffff',
   line: '#9aa0a6',
   border: 1,

@@ -39,18 +39,87 @@ export interface RawEmployeesFile {
   employees?: Record<string, Record<string, unknown>>
 }
 
-export type Encoding = 'enclosure' | 'node-link'
-export type ShapeKind = 'rectangle' | 'circle'
-export type Arrangement =
+/**
+ * Which of the two arrangements a View uses (#33).
+ *
+ * Both draw the SAME containment tree — `nested` is not "not a tree" — they differ
+ * only in HOW they draw it: boxes inside boxes, or boxes joined by lines. This is
+ * what v1 called an Encoding; that word is retired.
+ */
+export type Arrangement = 'nested' | 'tree'
+
+/** `ellipse`, not `circle` (#33): an `<ellipse>` inscribed in the box is what it has always drawn. */
+export type ShapeKind = 'rectangle' | 'ellipse'
+
+/**
+ * How sibling Teams flow. TRANSITIONAL (#33).
+ *
+ * v1 carried one union across both arrangements, which is exactly what forced the
+ * silent `radial -> fit` coercion the pairing table in `layout.ts` documents. #34
+ * and #35 dismantle it into tree's `direction` and nested's `wrap`; until then it
+ * is named for what it is rather than squatting on the word `Arrangement`.
+ */
+export type Flow =
   | 'fit'
   | 'left-to-right'
   | 'top-to-bottom'
   | 'radial'
   | `grid-${number}x${number}`
 
-/** Properties a Team-cascade layer may carry (#18). */
+/** Which way the `tree` arrangement grows. */
+export type TreeDirection = 'left-to-right' | 'top-to-bottom' | 'radial'
+
+/**
+ * Where a row of sibling Teams breaks, in the `nested` arrangement.
+ *
+ * Not a direction, deliberately (#34): `fit` chooses no direction at all, it wraps
+ * toward the window's aspect ratio. The other two wrap at a real window edge — the
+ * right edge and the bottom respectively.
+ */
+export type NestedWrap =
+  | 'fit'
+  | 'left-to-right-then-top-to-bottom'
+  | 'top-to-bottom-then-left-to-right'
+
+/**
+ * Every arrangement option a View carries (#34).
+ *
+ * BOTH tabs are persisted, not just the active one, so browsing to the other tab
+ * and back does not silently reset what you had set up there.
+ *
+ * The two tabs are deliberately asymmetric: tree's control is a *direction* and
+ * composes with `packSubtrees`, while nested's is a *wrap rule* whose values are
+ * mutually exclusive. Forcing one word onto both is what produced v1's silent
+ * `radial -> fit` coercion.
+ */
+export interface ArrangementDoc {
+  /** Which tab applies. The others keep their settings for when they are chosen. */
+  active: Arrangement
+  /** Global (#34): one Shape for the whole View, read by arrange, not a style layer. */
+  shape: ShapeKind
+  tree: {
+    direction: TreeDirection
+    /** Lay each top-level subtree out as a block and pack the blocks to the window. */
+    packSubtrees: boolean
+  }
+  nested: {
+    wrap: NestedWrap
+    /** Reorders child Teams to pack them tightest. Source order is lost when true. */
+    minimizeArea: boolean
+  }
+}
+
+/**
+ * Properties a Team-cascade layer may carry (#18).
+ *
+ * `shape` is NOT one of them any more (#34): it became a single global setting at
+ * `arrangement.shape`, because arrange has to read it — child Teams are packed
+ * inside their parent's Shape, and a per-layer override would pack as one shape
+ * and draw as another. Note the cascade layer named `shape` in `style` is a
+ * different thing entirely: it is keyed by Team Path. With the property gone, that
+ * name means only the layer.
+ */
 export interface TeamStyle {
-  shape?: ShapeKind
   fill?: string
   line?: string
   border?: number
@@ -79,12 +148,13 @@ export interface Geometry {
  */
 export interface ViewDoc {
   org: string
-  version: 1
-  encoding: Encoding
-  arrangement: {
-    default: Arrangement
-    teamDepth?: Record<number, Arrangement>
-  }
+  /**
+   * v2 (#34). v1 is REJECTED with a clear error, never upconverted: every v1 file
+   * in existence was in this repo and has been rewritten, so upconversion code
+   * would be permanent debt serving nobody.
+   */
+  version: 2
+  arrangement: ArrangementDoc
   detail: {
     positions: boolean
     occupantNames: boolean
@@ -108,7 +178,8 @@ export interface ViewDoc {
   }
   /**
    * Authoritative — this is what gets drawn. `arrangement` only records what the
-   * arrange command would apply next. Keyed by Team Path; Positions have no
+   * arrange command would apply NEXT, which is why a view saved after a hand-move
+   * still reopens exactly as it was left. Keyed by Team Path; Positions have no
    * identity and no geometry (#13).
    */
   geometry: Record<string, Geometry>

@@ -25,16 +25,16 @@ A human who occupies zero, one, or many Positions. Identified by email address. 
 _Avoid_: Person, member, staff, individual
 
 **View**:
-A saved candidate visual representation of one organization: its encoding, arrangement, styling, filter, detail switches and the geometry of every Team shape. Stored as `<org-prefix>.<view-name>.view.yaml` beside the organization's files. An organization has many Views; comparing them is what the workbench is for.
+A saved candidate visual representation of one organization: its Arrangement and that Arrangement's options, styling, filter, detail switches and the geometry of every Team shape. Stored as `<org-prefix>.<view-name>.view.yaml` beside the organization's files. An organization has many Views; comparing them is what the workbench is for.
 _Avoid_: Layout, diagram, chart, theme
 
-**Encoding**:
-How Team containment is drawn. Either *enclosure* — a Team drawn as a shape containing its child Teams — or *node-link*, Teams as separate shapes joined by lines. One Encoding governs a whole View.
-_Avoid_: Style, mode, representation
-
 **Arrangement**:
-Where sibling Teams are placed within their parent: left-to-right, top-to-bottom, radial, or a grid. Chosen per nesting depth. Applied by a command that overwrites all geometry; it is not a live constraint.
-_Avoid_: Layout, alignment, ordering
+How a View draws the organization. Either *nested* — a Team drawn as a shape containing its child Teams — or *tree*, Teams as separate shapes joined by lines. Both draw the **same** containment tree and differ only in how they draw it, so *nested* is not "not a tree". One Arrangement governs a whole View, and each Arrangement carries its own options. Applied by a command that overwrites all geometry; it is not a live constraint.
+_Avoid_: Encoding, enclosure, node-link, layout, style, mode, representation
+
+**Shape**:
+The figure a Team is drawn as: a rectangle or an ellipse. One Shape governs a whole View — it is not chosen per Team, because the Arrangement has to know it in order to place child Teams inside their parent.
+_Avoid_: Circle, figure, form
 
 **Occupant**:
 The Employee filling a Position. A Position has at most one Occupant; a Position without one is vacant.

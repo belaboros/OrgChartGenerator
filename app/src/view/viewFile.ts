@@ -8,7 +8,17 @@
  * while the file was at fault.
  */
 import yaml from 'js-yaml'
-import type { Arrangement, Encoding, Geometry, PositionStyle, ShapeKind, TeamStyle, ViewDoc } from '../files/types'
+import type {
+  Arrangement,
+  ArrangementDoc,
+  Geometry,
+  NestedWrap,
+  PositionStyle,
+  ShapeKind,
+  TeamStyle,
+  TreeDirection,
+  ViewDoc,
+} from '../files/types'
 import type { DetailSwitches } from './layout'
 import type { StyleDoc } from './cascade'
 
@@ -19,14 +29,26 @@ export class ViewFileError extends Error {
   }
 }
 
-const ENCODINGS: Encoding[] = ['enclosure', 'node-link']
-const SHAPES: ShapeKind[] = ['rectangle', 'circle']
-const TEAM_KEYS = ['shape', 'fill', 'line', 'border', 'font', 'text', 'margin'] as const
-const POSITION_KEYS = ['fill', 'text', 'font'] as const
+const ARRANGEMENTS: Arrangement[] = ['nested', 'tree']
+const SHAPES: ShapeKind[] = ['rectangle', 'ellipse']
+const TREE_DIRECTIONS: TreeDirection[] = ['left-to-right', 'top-to-bottom', 'radial']
+const NESTED_WRAPS: NestedWrap[] = [
+  'fit',
+  'left-to-right-then-top-to-bottom',
+  'top-to-bottom-then-left-to-right',
+]
 
-const isArrangement = (v: unknown): v is Arrangement =>
-  v === 'fit' || v === 'left-to-right' || v === 'top-to-bottom' || v === 'radial' ||
-  (typeof v === 'string' && /^grid-\d+x\d+$/.test(v))
+/** What a brand-new View arranges as, before anyone touches a control. */
+export const DEFAULT_ARRANGEMENT: ArrangementDoc = {
+  active: 'nested',
+  shape: 'rectangle',
+  tree: { direction: 'left-to-right', packSubtrees: true },
+  nested: { wrap: 'fit', minimizeArea: false },
+}
+
+/** No `shape` (#34): it left the cascade and became `arrangement.shape`. */
+const TEAM_KEYS = ['fill', 'line', 'border', 'font', 'text', 'margin'] as const
+const POSITION_KEYS = ['fill', 'text', 'font'] as const
 
 function reject(where: string, message: string): never {
   throw new ViewFileError(`${where}: ${message}`)
@@ -48,9 +70,6 @@ function asObject(v: unknown, where: string): Record<string, unknown> {
 function readTeamStyle(v: unknown, where: string): TeamStyle {
   const o = asObject(v, where)
   onlyKeys(o, TEAM_KEYS, where)
-  if (o['shape'] !== undefined && !SHAPES.includes(o['shape'] as ShapeKind)) {
-    reject(where, `shape must be one of ${SHAPES.join(', ')}`)
-  }
   return o as TeamStyle
 }
 
@@ -68,8 +87,7 @@ function readMap<T>(v: unknown, where: string, each: (x: unknown, w: string) => 
 }
 
 export interface ViewState {
-  encoding: Encoding
-  arrangement: { default: Arrangement; teamDepth?: Record<number, Arrangement> }
+  arrangement: ArrangementDoc
   detail: DetailSwitches
   filter: ReadonlySet<string>
   style: StyleDoc
@@ -95,16 +113,15 @@ export function toViewDoc(org: string, state: ViewState): ViewDoc {
 
   const doc: ViewDoc = {
     org,
-    version: 1,
-    encoding: state.encoding,
+    version: 2,
     arrangement: state.arrangement,
     detail: state.detail,
+    // Absent means every Role (#18); only written when it actually narrows. In
+    // declared order, not appended — appending buried it after 100 lines of
+    // geometry in a file whose field order is meant to be read (#34).
+    ...(state.filter.size > 0 ? { filter: { roles: [...state.filter].sort() } } : {}),
     style,
     geometry,
-  }
-  if (state.filter.size > 0) {
-    // Absent means every Role (#18); only write it when it actually narrows.
-    doc.filter = { roles: [...state.filter].sort() }
   }
   return doc
 }
@@ -135,28 +152,65 @@ function pruneEmpty<T extends object>(obj: T): T | undefined {
   return Object.keys(out).length ? (out as T) : undefined
 }
 
+const oneOf = <T extends string>(v: unknown, allowed: readonly T[], where: string): T => {
+  if (typeof v !== 'string' || !(allowed as readonly string[]).includes(v)) {
+    reject(where, `expected one of ${allowed.join(', ')}`)
+  }
+  return v as T
+}
+
+const bool = (v: unknown, where: string): boolean => {
+  if (typeof v !== 'boolean') reject(where, 'expected true or false')
+  return v
+}
+
+/**
+ * Both tabs are read whichever one is active (#34) — a View carries the settings
+ * you left on the other tab, so switching back does not reset them.
+ */
+function readArrangement(v: unknown): ArrangementDoc {
+  const o = asObject(v, 'arrangement')
+  onlyKeys(o, ['active', 'shape', 'tree', 'nested'], 'arrangement')
+  const tree = asObject(o['tree'], 'arrangement.tree')
+  onlyKeys(tree, ['direction', 'packSubtrees'], 'arrangement.tree')
+  const nested = asObject(o['nested'], 'arrangement.nested')
+  onlyKeys(nested, ['wrap', 'minimizeArea'], 'arrangement.nested')
+  return {
+    active: oneOf(o['active'], ARRANGEMENTS, 'arrangement.active'),
+    shape: oneOf(o['shape'], SHAPES, 'arrangement.shape'),
+    tree: {
+      direction: oneOf(tree['direction'], TREE_DIRECTIONS, 'arrangement.tree.direction'),
+      packSubtrees: bool(tree['packSubtrees'], 'arrangement.tree.packSubtrees'),
+    },
+    nested: {
+      wrap: oneOf(nested['wrap'], NESTED_WRAPS, 'arrangement.nested.wrap'),
+      minimizeArea: bool(nested['minimizeArea'], 'arrangement.nested.minimizeArea'),
+    },
+  }
+}
+
 export function parseViewDoc(raw: unknown): ViewDoc {
   const o = asObject(raw, 'file')
-  onlyKeys(o, ['org', 'version', 'encoding', 'arrangement', 'detail', 'filter', 'style', 'geometry'], 'file')
 
+  // The version gate runs FIRST. Checked after the key list, a v1 file is refused
+  // for saying `encoding` — true, but useless: the reason it fails is its version,
+  // and that is what the reader should say (#34).
+  if (o['version'] !== 2) {
+    // v1 is refused by NAME, not by a bare number mismatch: the reader knows
+    // exactly what a v1 file is and can say why it cannot open it (#34).
+    reject(
+      'version',
+      o['version'] === 1
+        ? 'this is a v1 view file. v1 is not supported — v2 replaced `encoding` with an ' +
+          'arrangement block carrying both tabs\' options and a global shape. Recreate the view.'
+        : `expected 2, found ${JSON.stringify(o['version'])}`,
+    )
+  }
+
+  onlyKeys(o, ['org', 'version', 'arrangement', 'detail', 'filter', 'style', 'geometry'], 'file')
   if (typeof o['org'] !== 'string') reject('org', 'expected a string')
-  if (o['version'] !== 1) reject('version', `expected 1, found ${JSON.stringify(o['version'])}`)
-  if (!ENCODINGS.includes(o['encoding'] as Encoding)) {
-    reject('encoding', `expected one of ${ENCODINGS.join(', ')}`)
-  }
 
-  const arr = asObject(o['arrangement'], 'arrangement')
-  onlyKeys(arr, ['default', 'teamDepth'], 'arrangement')
-  if (!isArrangement(arr['default'])) reject('arrangement.default', 'not a known arrangement')
-  let teamDepth: Record<number, Arrangement> | undefined
-  if (arr['teamDepth'] !== undefined) {
-    teamDepth = {}
-    for (const [k, v] of Object.entries(asObject(arr['teamDepth'], 'arrangement.teamDepth'))) {
-      if (!/^\d+$/.test(k)) reject(`arrangement.teamDepth.${k}`, 'depth must be a whole number')
-      if (!isArrangement(v)) reject(`arrangement.teamDepth.${k}`, 'not a known arrangement')
-      teamDepth[Number(k)] = v
-    }
-  }
+  const arrangement = readArrangement(o['arrangement'])
 
   const det = asObject(o['detail'], 'detail')
   onlyKeys(det, ['positions', 'occupantNames', 'counts'], 'detail')
@@ -205,9 +259,8 @@ export function parseViewDoc(raw: unknown): ViewDoc {
 
   return {
     org: o['org'] as string,
-    version: 1,
-    encoding: o['encoding'] as Encoding,
-    arrangement: teamDepth ? { default: arr['default'], teamDepth } : { default: arr['default'] },
+    version: 2,
+    arrangement,
     detail: det as unknown as DetailSwitches,
     ...(filter ? { filter } : {}),
     style,

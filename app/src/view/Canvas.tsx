@@ -6,6 +6,7 @@
  * faster to first paint than either library candidate, and with no dependency.
  */
 import { useCallback, useEffect, useImperativeHandle, useRef, useState, forwardRef } from 'react'
+import type { ShapeKind } from '../files/types'
 import type { Placement, PlacedTeam, DetailSwitches } from './layout'
 import { positionLabel, METRICS } from './layout'
 import type { StyleDoc } from './cascade'
@@ -21,6 +22,8 @@ export interface CanvasHandle {
 interface Props {
   placement: Placement
   style: StyleDoc
+  /** Global since #34 — one Shape for the whole View, not a cascade layer. */
+  shape: ShapeKind
   detail: DetailSwitches
   selected: string | null
   onSelect(path: string | null): void
@@ -42,7 +45,7 @@ interface Transform {
 }
 
 export const Canvas = forwardRef<CanvasHandle, Props>(function Canvas(
-  { placement, style, detail, selected, onSelect, manual, onMove, onResize },
+  { placement, style, shape, detail, selected, onSelect, manual, onMove, onResize },
   ref,
 ) {
   const svgRef = useRef<SVGSVGElement | null>(null)
@@ -164,6 +167,7 @@ export const Canvas = forwardRef<CanvasHandle, Props>(function Canvas(
                   : n
               }
               style={style}
+              shape={shape}
               detail={detail}
               selected={selected === n.path}
               hand={manual.has(n.path)}
@@ -186,11 +190,11 @@ export const Canvas = forwardRef<CanvasHandle, Props>(function Canvas(
   )
 })
 
-/** Containment edges. Only drawn for node-link; in enclosure a parent encloses its children. */
+/** Containment edges. Only drawn for `tree`; in `nested` a parent already contains its children. */
 function Edge({ node, nodes }: { node: PlacedTeam; nodes: PlacedTeam[] }) {
   const parent = nodes.find((m) => m.path === node.parentPath)
   if (!parent) return null
-  // Inside an enclosing parent an edge would be noise, so skip it.
+  // Inside a containing parent an edge would be noise, so skip it.
   const inside =
     node.x >= parent.x && node.y >= parent.y &&
     node.x + node.w <= parent.x + parent.w && node.y + node.h <= parent.y + parent.h
@@ -217,6 +221,7 @@ function subtreeOf(placement: Placement, path: string): Set<string> {
 function TeamShape({
   node,
   style,
+  shape,
   detail,
   selected,
   hand,
@@ -226,6 +231,7 @@ function TeamShape({
 }: {
   node: PlacedTeam
   style: StyleDoc
+  shape: ShapeKind
   detail: DetailSwitches
   selected: boolean
   hand: boolean
@@ -247,7 +253,7 @@ function TeamShape({
         onStartMove(node.path, e)
       }}
     >
-      {s.shape === 'circle' ? (
+      {shape === 'ellipse' ? (
         <ellipse
           cx={node.w / 2}
           cy={node.h / 2}

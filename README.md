@@ -17,13 +17,13 @@ Needs Chrome or Edge — it opens a folder and writes views back into it. See
 
 | | |
 |---|---|
-| [`app/`](app/) | The workbench — encodings, arrangements, style cascades, PNG export |
+| [`app/`](app/) | The workbench — arrangements and their options, style cascades, PNG export |
 | [`acme-tiny-*.yaml`](acme-tiny-teams.yaml) | Hand-written worked example, exercising every case the format supports |
 | `acme-small-*`, `acme-medium-*`, `acme-large-*` | Generated organizations of 10, 30 and 100 Teams |
 | `*.view.yaml` | Worked views — open one to see a real diagram on the first run |
 | [`schemas/`](schemas/) | JSON Schemas — editors validate the files as you type |
 | [`scripts/validate.sh`](scripts/validate.sh) | Validates a file, or both files of an organization, against them |
-| [`CONTEXT.md`](CONTEXT.md) | The glossary: Team, Position, Role, View, Encoding, Arrangement, Employee, Occupant |
+| [`CONTEXT.md`](CONTEXT.md) | The glossary: Team, Position, Role, Path, View, Arrangement, Shape, Employee, Occupant |
 
 ## The format
 
@@ -67,7 +67,7 @@ cd app && npm install && npm run dev
 ```
 
 Open the folder holding your org files, pick an organization, and try representations against
-each other: two encodings, five arrangements, two shapes, independent detail switches, a Role
+each other: two arrangements each with its own options, two shapes, independent detail switches, a Role
 filter, and styling that cascades by nesting depth.
 
 Keep the ones worth keeping as `<org>.<view>.view.yaml` beside the org files — one file per

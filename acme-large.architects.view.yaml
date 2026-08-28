@@ -1,12 +1,16 @@
 org: ACME-large
-version: 1
-encoding: enclosure
+version: 2
 arrangement:
-  default: fit
+  active: nested
+  shape: rectangle
+  tree: {direction: left-to-right, packSubtrees: true}
+  nested: {wrap: fit, minimizeArea: false}
 detail:
   positions: true
   occupantNames: true
   counts: false
+filter:
+  roles: [DomainArchitect, ProductOwner, SystemArchitect]
 style:
   org: {border: 3, font: 17, fill: "#fafafa"}
   teamDepth: {"1": {border: 2, font: 15, fill: "#f1f6ff"}, "2": {border: 1, font: 13, fill: "#ffffff"}, "3": {border: 1, font: 12, fill: "#fcfcfd"}}
@@ -113,5 +117,3 @@ geometry:
   ACME-large/retail/TaxExperience/NotificationSystems: {x: 30, y: 681, w: 218, h: 59}
   ACME-large/retail/TaxExperience/WalletManagement: {x: 30, y: 539, w: 198, h: 59}
   ACME-large/retail/TaxExperience/WalletServices: {x: 260, y: 681, w: 140, h: 59}
-filter:
-  roles: [DomainArchitect, ProductOwner, SystemArchitect]

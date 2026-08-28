@@ -1,13 +1,14 @@
 /**
  * Placement. This ticket (#25) needs *a* layout to have something to render;
- * the five arrangements, the depth cascade and arrange-as-a-command are #26.
+ * the five flows, the depth cascade and arrange-as-a-command are #26.
  * What is settled here is the SHAPE of the output — the renderer consumes plain
  * absolute geometry and owns it thereafter, which is why no layout engine is a
  * dependency (#21).
  */
-import type { Arrangement, Encoding } from '../files/types'
+import type { ArrangementDoc } from '../files/types'
 import type { Organization, Team } from '../model/types'
-import { arrangeSiblings, arrangementFor } from './arrange'
+import type { Wrap } from './arrange'
+import { arrangeSiblings } from './arrange'
 
 export interface PlacedPosition {
   role: string
@@ -36,6 +37,12 @@ export interface Placement {
   nodes: PlacedTeam[]
   width: number
   height: number
+  /**
+   * Set when the chosen options name something the engine cannot do YET (#34).
+   * The nearest working layout is drawn, and the UI is obliged to say so — a
+   * fallback the user cannot see is exactly the v1 behaviour this effort kills.
+   */
+  unsupported?: string
 }
 
 export interface DetailSwitches {
@@ -44,20 +51,20 @@ export interface DetailSwitches {
   counts: boolean
 }
 
-export interface ArrangementCascade {
-  default: Arrangement
-  /** Keyed by the depth of the SIBLINGS being arranged, like the style cascade. */
-  teamDepth?: Record<number, Arrangement>
-}
-
 export interface LayoutOptions {
-  encoding: Encoding
+  arrangement: ArrangementDoc
   detail: DetailSwitches
   /** Absent or empty means every Role. */
   roleFilter?: ReadonlySet<string>
-  arrangement: ArrangementCascade
-  /** Width / height of the window the diagram has to fill. Only `fit` uses it. */
-  targetAspect: number
+  /**
+   * The window, in world units, SNAPSHOTTED when arrange ran (#35).
+   *
+   * Absolute size, not the ratio v1 passed: `left-to-right-then-top-to-bottom`
+   * breaks a row at a real width, and a ratio cannot say where that is. One world
+   * unit is one pixel at 100% zoom — the canvas rescales the finished diagram to
+   * fill the window, so this fixes where rows BREAK, not how large they render.
+   */
+  window: { w: number; h: number }
 }
 
 const HEADER = 24
@@ -141,21 +148,32 @@ interface Box {
   kids: (Box & { rx: number; ry: number })[]
 }
 
-/** Nested enclosure: a Team is a shape containing its child Teams. */
-function enclose(n: Node, o: LayoutOptions): Box {
-  const kids = n.children.map((c) => enclose(c, o)) as (Box & { rx: number; ry: number })[]
+/**
+ * Which wrap breaks the children of `n` (#35).
+ *
+ * The window-edge wraps bind at the TOP LEVEL ONLY — `n` is the organization, at
+ * depth 0. Deeper siblings are bounded by their parent, and the parent's size
+ * derives from those very children, so there is no window edge down there to break
+ * against. They keep targeting the window's shape, which is what `fit` has always
+ * done at every level.
+ */
+function wrapFor(n: Node, o: LayoutOptions, target: number): Wrap {
+  const wrap = o.arrangement.nested.wrap
+  if (wrap === 'fit' || n.depth !== 0) return { kind: 'aspect', target }
+  return wrap === 'left-to-right-then-top-to-bottom'
+    ? { kind: 'width', limit: o.window.w }
+    : { kind: 'height', limit: o.window.h }
+}
+
+/** The `nested` arrangement: a Team is a shape containing its child Teams. */
+function nest(n: Node, o: LayoutOptions, target: number): Box {
+  const kids = n.children.map((c) => nest(c, o, target)) as (Box & { rx: number; ry: number })[]
   const own = ownHeight(n, o)
 
   let innerW = 0
   let innerH = 0
   if (kids.length) {
-    // Children of a node at depth d are themselves at depth d+1, and that is the
-    // depth their arrangement is keyed by.
-    // There is no enclosure form of `radial`, so it falls back to `fit` — the
-    // useful default — rather than silently becoming left-to-right.
-    const chosen = arrangementFor(o.arrangement, n.depth + 1)
-    const arrangement = chosen === 'radial' ? 'fit' : chosen
-    const { placed, w, h } = arrangeSiblings(kids, arrangement, o.targetAspect)
+    const { placed, w, h } = arrangeSiblings(kids, wrapFor(n, o, target))
     for (let i = 0; i < kids.length; i++) {
       kids[i]!.rx = placed[i]!.rx
       kids[i]!.ry = placed[i]!.ry
@@ -338,12 +356,12 @@ interface M {
 const HG = 70
 const VG = 16
 
-function measureNodeLink(n: Node, o: LayoutOptions): M {
+function measureTree(n: Node, o: LayoutOptions): M {
   return {
     n,
     w: Math.max(140, ownWidth(n, o)),
     h: ownHeight(n, o) + PAD,
-    kids: n.children.map((c) => measureNodeLink(c, o)),
+    kids: n.children.map((c) => measureTree(c, o)),
     span: 0,
   }
 }
@@ -391,33 +409,39 @@ function placeSubtree(
 }
 
 /**
- * `fit` for node-link. Flowing every Team in one direction gives a 1:9 tower or a
- * 22:1 strip on acme-large, and picking the lesser of the two is still wrong — so
- * lay each top-level subtree out as a BLOCK and pack the blocks to the window's
- * aspect, exactly as enclosure's `fit` packs sibling Teams.
+ * `fit` for the `tree` arrangement. Flowing every Team in one direction gives a
+ * 1:9 tower or a 22:1 strip on acme-large, and picking the lesser of the two is
+ * still wrong — so lay each top-level subtree out as a BLOCK and pack the blocks
+ * to the window's aspect, exactly as `nested`'s `fit` packs sibling Teams.
  */
-function nodeLinkFit(root: Node, o: LayoutOptions): PlacedTeam[] {
-  const m = measureNodeLink(root, o)
-  if (!m.kids.length) return placeSubtree(m, false, null).nodes
+function treeFit(root: Node, o: LayoutOptions, vertical: boolean): PlacedTeam[] {
+  const m = measureTree(root, o)
+  if (!m.kids.length) return placeSubtree(m, vertical, null).nodes
 
-  const blocks = m.kids.map((k) => placeSubtree(k, false, root.path))
-  const packed = arrangeSiblings(blocks, 'fit', o.targetAspect)
+  const blocks = m.kids.map((k) => placeSubtree(k, vertical, root.path))
+  const packed = arrangeSiblings(blocks, { kind: 'aspect', target: o.window.w / Math.max(1, o.window.h) })
 
   const out: PlacedTeam[] = []
   for (const b of packed.placed) {
     for (const n of b.nodes) out.push({ ...n, x: n.x + b.rx, y: n.y + b.ry })
   }
-  // The organization's own shape sits to the left of the packed blocks, centred.
-  const top = Math.min(...out.map((n) => n.y))
-  const bottom = Math.max(...out.map((n) => n.y + n.h))
-  for (const n of out) n.x += m.w + HG
+  // The organization's own shape sits before the packed blocks, centred across
+  // them — to the left when the tree grows sideways, above when it grows down.
+  const across = (from: (n: PlacedTeam) => number, to: (n: PlacedTeam) => number): number =>
+    (Math.min(...out.map(from)) + Math.max(...out.map(to))) / 2
+  const centreY = across((n) => n.y, (n) => n.y + n.h) - m.h / 2
+  const centreX = across((n) => n.x, (n) => n.x + n.w) - m.w / 2
+  for (const n of out) {
+    if (vertical) n.y += m.h + HG
+    else n.x += m.w + HG
+  }
   out.unshift({
     path: root.path,
     name: root.name,
     depth: 0,
     parentPath: null,
-    x: 0,
-    y: (top + bottom) / 2 - m.h / 2,
+    x: vertical ? centreX : 0,
+    y: vertical ? 0 : centreY,
     w: m.w,
     h: m.h,
     positions: root.positions,
@@ -428,8 +452,8 @@ function nodeLinkFit(root: Node, o: LayoutOptions): PlacedTeam[] {
 }
 
 /** Node-link: Teams as separate shapes joined by containment edges. */
-function nodeLink(root: Node, o: LayoutOptions, vertical: boolean): PlacedTeam[] {
-  return placeSubtree(measureNodeLink(root, o), vertical, null).nodes
+function tree(root: Node, o: LayoutOptions, vertical: boolean): PlacedTeam[] {
+  return placeSubtree(measureTree(root, o), vertical, null).nodes
 }
 
 const extent = (nodes: PlacedTeam[]): { width: number; height: number } => ({
@@ -438,42 +462,61 @@ const extent = (nodes: PlacedTeam[]): { width: number; height: number } => ({
 })
 
 /**
- * Not every arrangement means something in every encoding. Rather than silently
+ * Not every flow means something in every arrangement. Rather than silently
  * drawing something unintended, each pairing is decided here, once:
  *
- *   enclosure  fit | left-to-right | top-to-bottom | grid-CxR   (radial -> fit)
- *   node-link  left-to-right | top-to-bottom | radial          (grid -> left-to-right,
- *                                                                fit -> whichever of the
- *                                                                two flows fits better)
+ *   nested  fit | left-to-right | top-to-bottom | grid-CxR   (radial -> fit)
+ *   tree    left-to-right | top-to-bottom | radial           (grid -> left-to-right,
+ *                                                             fit -> whichever of the
+ *                                                             two flows fits better)
+ *
+ * These coercions are v1 behaviour, preserved here unchanged (#33 renames only).
+ * #35 replaces the table outright: tree gets a `direction`, nested gets a `wrap`,
+ * and the pairs that had to be coerced stop being representable.
+ */
+/**
+ * Dispatch (#35). Every pairing that v1 had to coerce is now simply unrepresentable:
+ * a direction belongs to `tree` and a wrap to `nested`, so neither can be handed to
+ * the arrangement it means nothing in. `packSubtrees` under `radial` is likewise not
+ * a refused combination but an INAPPLICABLE one — radial is already a single
+ * concentric arrangement of the whole tree, so there are no blocks to pack, and the
+ * panel does not offer the option there (#36).
  */
 export function layout(org: Organization, o: LayoutOptions): Placement {
   const root = asTree(org, o)
+  const target = o.window.w / Math.max(1, o.window.h)
+  const a = o.arrangement
 
-  if (o.encoding === 'node-link') {
-    const want = o.arrangement.default
-    if (want === 'radial') {
+  if (a.active === 'tree') {
+    if (a.tree.direction === 'radial') {
       const nodes = radial(root, o)
       return { nodes, ...extent(nodes) }
     }
-    if (want === 'top-to-bottom') {
-      const nodes = nodeLink(root, o, true)
-      return { nodes, ...extent(nodes) }
-    }
-    if (want === 'left-to-right' || want.startsWith('grid-')) {
-      const nodes = nodeLink(root, o, false)
-      return { nodes, ...extent(nodes) }
-    }
-    const nodes = nodeLinkFit(root, o)
+    const vertical = a.tree.direction === 'top-to-bottom'
+    const nodes = a.tree.packSubtrees ? treeFit(root, o, vertical) : tree(root, o, vertical)
     return { nodes, ...extent(nodes) }
   }
 
-  const encloseOnce = (opts: LayoutOptions): { nodes: PlacedTeam[]; width: number; height: number } => {
+  const nestOnce = (t: number): { nodes: PlacedTeam[]; width: number; height: number } => {
     const nodes: PlacedTeam[] = []
-    flatten(enclose(asTree(org, opts), opts), 0, 0, null, nodes)
+    flatten(nest(asTree(org, o), o, t), 0, 0, null, nodes)
     return { nodes, ...extent(nodes) }
   }
 
-  if (o.arrangement.default !== 'fit' && o.arrangement.default !== 'radial') return encloseOnce(o)
+  // The one option still without an engine (#38 prototypes it, #39 decides how it
+  // meets the window edge). Reported, never silently dropped.
+  const unsupported = a.nested.minimizeArea
+    ? '"minimize area" is not implemented yet (#38) — drawn without it'
+    : undefined
+  const note = (p: { nodes: PlacedTeam[]; width: number; height: number }): Placement =>
+    unsupported ? { ...p, unsupported } : p
+
+  /*
+   * A window-edge wrap breaks at a fixed width, so there is nothing to search for:
+   * one pass, and the same organization breaks in the same place every time. The
+   * sweep below exists only to steer `fit`.
+   */
+  if (a.nested.wrap !== 'fit') return note(nestOnce(target))
 
   /*
    * Each level packs against a target, but a parent inherits its widest child's
@@ -485,8 +528,8 @@ export function layout(org: Organization, o: LayoutOptions): Placement {
   let bestErr = Number.POSITIVE_INFINITY
   for (let i = 0; i <= 16; i++) {
     const bias = Math.exp((i / 16) * 2 * Math.log(6) - Math.log(6)) // 1/6 .. 6
-    const candidate = encloseOnce({ ...o, targetAspect: o.targetAspect * bias })
-    const err = Math.abs(Math.log(candidate.width / candidate.height / o.targetAspect))
+    const candidate = nestOnce(target * bias)
+    const err = Math.abs(Math.log(candidate.width / candidate.height / target))
     if (err < bestErr) {
       bestErr = err
       best = candidate
@@ -495,7 +538,7 @@ export function layout(org: Organization, o: LayoutOptions): Placement {
     // sample is a full layout of the whole organization.
     if (bestErr < 0.02) break
   }
-  return best ?? encloseOnce(o)
+  return note(best ?? nestOnce(target))
 }
 
 export const METRICS = { HEADER, LINE, PAD }

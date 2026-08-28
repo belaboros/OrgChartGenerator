@@ -1,7 +1,7 @@
-import type { PositionStyle, ShapeKind, TeamStyle } from '../files/types'
+import type { PositionStyle, TeamStyle } from '../files/types'
 
 type Any = TeamStyle & PositionStyle
-type Patch = Partial<Record<keyof Any, string | number | ShapeKind | undefined>>
+type Patch = Partial<Record<keyof Any, string | number | undefined>>
 
 const COLOURS = ['fill', 'line', 'text'] as const
 const NUMBERS = ['border', 'font', 'margin'] as const
@@ -20,20 +20,6 @@ export function LayerEditor({
   const numbers = kind === 'team' ? NUMBERS : (['font'] as const)
   return (
     <div style={S.wrap}>
-      {kind === 'team' && (
-        <label style={S.row}>
-          <span>shape</span>
-          <select
-            value={(value.shape as string) ?? ''}
-            onChange={(e) => onChange({ shape: (e.target.value || undefined) as ShapeKind | undefined })}
-            style={S.input}
-          >
-            <option value="">inherit</option>
-            <option value="rectangle">rectangle</option>
-            <option value="circle">circle</option>
-          </select>
-        </label>
-      )}
       {colours.map((k) => (
         <label key={k} style={S.row}>
           <span>{k}</span>
