@@ -11,6 +11,8 @@ import type { Placement, PlacedTeam, DetailSwitches } from './layout'
 import { positionLabel, METRICS } from './layout'
 import type { StyleDoc } from './cascade'
 import { resolvePositionStyle, resolveTeamStyle } from './cascade'
+import type { Box } from './contain'
+import { contains, holdsContent } from './contain'
 
 export interface CanvasHandle {
   fit(): void
@@ -30,13 +32,14 @@ interface Props {
   /** Paths carrying hand-placed geometry, so they can be marked as such. */
   manual: ReadonlySet<string>
   onMove(path: string, dx: number, dy: number): void
-  onResize(path: string, w: number, h: number): void
+  /** The full box, because `ellipse` resizes about its centre and so moves x/y (#48). */
+  onResize(path: string, box: { x: number; y: number; w: number; h: number }): void
 }
 
 type Drag =
   | { kind: 'pan'; sx: number; sy: number }
   | { kind: 'move'; path: string; ox: number; oy: number; dx: number; dy: number }
-  | { kind: 'resize'; path: string; x: number; y: number; w: number; h: number }
+  | { kind: 'resize'; path: string; x: number; y: number; w: number; h: number; box: Box }
 
 interface Transform {
   x: number
@@ -53,7 +56,18 @@ export const Canvas = forwardRef<CanvasHandle, Props>(function Canvas(
   const drag = useRef<Drag | null>(null)
   /** Live drag feedback, applied at render; committed to real geometry on release. */
   const [preview, setPreview] = useState<{ paths: Set<string>; dx: number; dy: number } | null>(null)
-  const [sizing, setSizing] = useState<{ path: string; w: number; h: number } | null>(null)
+  const [sizing, setSizing] = useState<{ path: string; x: number; y: number; w: number; h: number } | null>(null)
+  /**
+   * The boundary that stopped a drag (#46). Hitting a limit ENDS the gesture, so
+   * without a mark the shape would simply stop following the pointer and the whole
+   * thing would read as a dropped drag rather than as protection.
+   */
+  const [stoppedBy, setStoppedBy] = useState<string | null>(null)
+  useEffect(() => {
+    if (!stoppedBy) return
+    const id = setTimeout(() => setStoppedBy(null), 1400)
+    return () => clearTimeout(id)
+  }, [stoppedBy])
 
   const toWorld = useCallback(
     (e: { clientX: number; clientY: number }): { x: number; y: number } => {
@@ -80,6 +94,43 @@ export const Canvas = forwardRef<CanvasHandle, Props>(function Canvas(
     const id = requestAnimationFrame(fit)
     return () => cancelAnimationFrame(id)
   }, [fit])
+
+  const nodeOf = useCallback(
+    (path: string): PlacedTeam | undefined => placement.nodes.find((n) => n.path === path),
+    [placement],
+  )
+
+  /**
+   * Nesting protection (#46). A move is legal when the dragged Team is still inside
+   * its parent's Shape — the subtree translates rigidly, so only the dragged Team
+   * need be tested. A resize is legal when it is inside its parent AND still holds
+   * its own children and labels.
+   *
+   * The organization has no parent, so nothing contains it.
+   */
+  const legal = useCallback(
+    (path: string, box: { x: number; y: number; w: number; h: number }, checkContent: boolean): boolean => {
+      const n = nodeOf(path)
+      if (!n) return false
+      const parent = n.parentPath ? nodeOf(n.parentPath) : undefined
+      if (parent && !contains(parent, shape, box)) return false
+      if (!checkContent) return true
+      const kids = placement.nodes.filter((m) => m.parentPath === path)
+      return holdsContent(box, shape, kids, n, detail)
+    },
+    [nodeOf, placement, shape, detail],
+  )
+
+  /** Commit whatever was last legal and end the gesture — the pointer keeps going. */
+  const stopDrag = useCallback((e: React.PointerEvent<SVGSVGElement>, blockedBy: string | null) => {
+    const d = drag.current
+    drag.current = null
+    setPreview(null)
+    setSizing(null)
+    if (svgRef.current?.hasPointerCapture(e.pointerId)) svgRef.current.releasePointerCapture(e.pointerId)
+    setStoppedBy(blockedBy)
+    return d
+  }, [])
 
   const onWheel = useCallback((e: React.WheelEvent<SVGSVGElement>) => {
     const el = svgRef.current
@@ -115,18 +166,38 @@ export const Canvas = forwardRef<CanvasHandle, Props>(function Canvas(
           return
         }
         const world = toWorld(e)
+        const n = nodeOf(d.path)
+        if (!n) return
+
         if (d.kind === 'move') {
           const dx = world.x - d.ox
           const dy = world.y - d.oy
+          if (!legal(d.path, { x: n.x + dx, y: n.y + dy, w: n.w, h: n.h }, false)) {
+            // Crossed the boundary: keep the last legal offsets and end the gesture.
+            const done = stopDrag(e, n.parentPath)
+            if (done && done.kind === 'move' && (done.dx !== 0 || done.dy !== 0)) onMove(done.path, done.dx, done.dy)
+            return
+          }
           d.dx = dx
           d.dy = dy
           setPreview({ paths: subtreeOf(placement, d.path), dx, dy })
         } else {
-          const w = Math.max(60, world.x - d.x)
-          const h = Math.max(34, world.y - d.y)
+          // `ellipse` grows about its centre (#48); `rectangle` from its fixed corner.
+          const w = Math.max(20, world.x - d.x)
+          const h = Math.max(20, world.y - d.y)
+          const box =
+            shape === 'ellipse'
+              ? { x: n.x + (n.w - w) / 2, y: n.y + (n.h - h) / 2, w, h }
+              : { x: d.x, y: d.y, w, h }
+          if (!legal(d.path, box, true)) {
+            const done = stopDrag(e, n.parentPath ?? d.path)
+            if (done && done.kind === 'resize') onResize(done.path, done.box)
+            return
+          }
           d.w = w
           d.h = h
-          setSizing({ path: d.path, w, h })
+          d.box = box
+          setSizing({ path: d.path, ...box })
         }
       }}
       onPointerUp={(e) => {
@@ -139,7 +210,7 @@ export const Canvas = forwardRef<CanvasHandle, Props>(function Canvas(
         if (d.kind === 'move') {
           if (d.dx !== 0 || d.dy !== 0) onMove(d.path, d.dx, d.dy)
         } else {
-          onResize(d.path, d.w, d.h)
+          onResize(d.path, d.box)
         }
       }}
     >
@@ -159,8 +230,8 @@ export const Canvas = forwardRef<CanvasHandle, Props>(function Canvas(
                 moved || resized
                   ? {
                       ...n,
-                      x: n.x + (moved?.dx ?? 0),
-                      y: n.y + (moved?.dy ?? 0),
+                      x: resized ? resized.x : n.x + (moved?.dx ?? 0),
+                      y: resized ? resized.y : n.y + (moved?.dy ?? 0),
                       w: resized?.w ?? n.w,
                       h: resized?.h ?? n.h,
                     }
@@ -179,12 +250,28 @@ export const Canvas = forwardRef<CanvasHandle, Props>(function Canvas(
                 svgRef.current?.setPointerCapture(e.pointerId)
               }}
               onStartResize={(path, e) => {
-                drag.current = { kind: 'resize', path, x: n.x, y: n.y, w: n.w, h: n.h }
+                drag.current = { kind: 'resize', path, x: n.x, y: n.y, w: n.w, h: n.h, box: { x: n.x, y: n.y, w: n.w, h: n.h } }
                 svgRef.current?.setPointerCapture(e.pointerId)
               }}
             />
           )
         })}
+        {/*
+          The boundary that stopped a drag (#46). The gesture ends rather than
+          clamping, so without this the shape just stops following the pointer and
+          the whole thing reads as a dropped drag rather than as protection.
+        */}
+        {stoppedBy &&
+          (() => {
+            const p = placement.nodes.find((n) => n.path === stoppedBy)
+            if (!p) return null
+            const common = { fill: 'none', stroke: '#c0392b', strokeWidth: 3, pointerEvents: 'none' as const }
+            return shape === 'ellipse' ? (
+              <ellipse data-k="stopped" cx={p.x + p.w / 2} cy={p.y + p.h / 2} rx={p.w / 2} ry={p.h / 2} {...common} />
+            ) : (
+              <rect data-k="stopped" x={p.x} y={p.y} width={p.w} height={p.h} rx={4} {...common} />
+            )
+          })()}
       </g>
     </svg>
   )

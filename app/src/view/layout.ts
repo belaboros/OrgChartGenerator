@@ -139,16 +139,31 @@ function asTree(org: Organization, o: LayoutOptions): Node {
   }
 }
 
-const ownHeight = (n: Node, o: LayoutOptions): number =>
-  HEADER + n.positions.length * LINE + (o.detail.counts ? LINE : 0)
+/** Anything carrying a Team's own label content — a layout `Node` or a `PlacedTeam`. */
+export interface Labelled {
+  name: string
+  positions: readonly PlacedPosition[]
+}
 
-const ownWidth = (n: Node, o: LayoutOptions): number =>
-  Math.max(
+/**
+ * What a Team's own label block needs (#45).
+ *
+ * Exported so containment measures the label block with the SAME formula that
+ * sized it. A second copy would drift, and then "does this Team still hold its
+ * labels" would answer differently from "how big did layout make it".
+ */
+export const labelBox = (n: Labelled, detail: DetailSwitches): { w: number; h: number } => ({
+  w: Math.max(
     120,
     n.name.length * CHAR + 24,
-    ...n.positions.map((p) => positionLabel(p, o.detail).length * CHAR + 20),
-    o.detail.counts ? 150 : 0,
-  )
+    ...n.positions.map((p) => positionLabel(p, detail).length * CHAR + 20),
+    detail.counts ? 150 : 0,
+  ),
+  h: HEADER + n.positions.length * LINE + (detail.counts ? LINE : 0),
+})
+
+const ownHeight = (n: Node, o: LayoutOptions): number => labelBox(n, o.detail).h
+const ownWidth = (n: Node, o: LayoutOptions): number => labelBox(n, o.detail).w
 
 interface Box {
   n: Node

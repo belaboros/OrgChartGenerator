@@ -11,6 +11,7 @@ import { Inspector } from './ui/Inspector'
 import { renderSvgToPng, ExportTooLarge } from './view/png'
 import { DEFAULT_ARRANGEMENT, parseViewDoc, serialise, toViewDoc, viewFileName, viewNameOf, ViewFileError } from './view/viewFile'
 import type { CanvasHandle } from './view/Canvas'
+import { holdsContent, outOfBounds, resizeFloor } from './view/contain'
 import { DEFAULT_STYLE, writeLayer } from './view/cascade'
 import type { StyleDoc } from './view/cascade'
 import { useFps } from './useFps'
@@ -154,18 +155,14 @@ export function Workbench({ org, files, onClose }: { org: Organization; files: F
     [placement],
   )
 
-  /** Resizing affects only the Team resized; its children keep their own geometry. */
-  const onResize = useCallback(
-    (path: string, w: number, h: number) => {
-      setManual((prev) => {
-        const n = placement.nodes.find((m) => m.path === path)
-        if (!n) return prev
-        const cur = prev[path] ?? { x: n.x, y: n.y, w: n.w, h: n.h }
-        return { ...prev, [path]: { ...cur, w, h } }
-      })
-    },
-    [placement],
-  )
+  /**
+   * Resizing affects only the Team resized; its children keep their own geometry.
+   * The whole box arrives, not just a size: under `ellipse` a resize grows about the
+   * centre (#48), so the origin moves too.
+   */
+  const onResize = useCallback((path: string, box: { x: number; y: number; w: number; h: number }) => {
+    setManual((prev) => ({ ...prev, [path]: box }))
+  }, [])
 
   useEffect(() => {
     void files.listViews(org.prefix).then(setViews)
@@ -222,6 +219,36 @@ export function Workbench({ org, files, onClose }: { org: Organization; files: F
     }
   }, [placement, manual, manualCount])
 
+  /**
+   * Teams drawn outside their parent (#47). Computed over the geometry actually on
+   * screen — hand-placed overlaid on Arrange's output — which is why it cannot come
+   * from `layout()` the way the degenerate-wrap notice does: `layout()` never sees
+   * hand-placed geometry.
+   */
+  const escaped = useMemo(
+    () => outOfBounds(placementWithManual.nodes, arrangement.active, arrangement.shape),
+    [placementWithManual, arrangement.active, arrangement.shape],
+  )
+
+  /**
+   * Notices come from two places that cannot be merged upstream, so the UI composes
+   * them (#47). Keeping `Placement.notice` a single string that describes the LAYOUT,
+   * and letting the view render a list, puts composition where the knowledge is
+   * rather than forcing `layout()` to learn about hand-placed geometry.
+   */
+  const notices = useMemo(() => {
+    const out: string[] = []
+    if (placement.notice) out.push(placement.notice)
+    if (escaped.length) {
+      out.push(
+        escaped.length === 1
+          ? '1 Team sits outside its parent — hand-placed geometry. Arrange will put it back.'
+          : `${escaped.length} Teams sit outside their parent — hand-placed geometry. Arrange will put them back.`,
+      )
+    }
+    return out
+  }, [placement.notice, escaped])
+
   // Handles for headless verification; harmless in production.
   useEffect(() => {
     const w = window as unknown as Record<string, unknown>
@@ -230,6 +257,45 @@ export function Workbench({ org, files, onClose }: { org: Organization; files: F
       const geometry: Record<string, { x: number; y: number; w: number; h: number }> = {}
       for (const n of placementWithManual.nodes) geometry[n.path] = { x: n.x, y: n.y, w: n.w, h: n.h }
       return serialise(toViewDoc(org.name, { arrangement: draft, detail, filter, style, geometry }))
+    }
+    /**
+     * Every Team that is NOT inside its parent's Shape (#45). Empty is the correct
+     * answer for anything Arrange produced; `tree` is excluded because children are
+     * never inside their parent there.
+     */
+    w['__containmentFailures'] = (): string[] => escaped
+    /** The smallest this Team may be drawn, and whether a candidate size holds (#45). */
+    w['__floor'] = (path: string): unknown => {
+      const node = placementWithManual.nodes.find((n) => n.path === path)
+      if (!node) return null
+      const kids = placementWithManual.nodes.filter((n) => n.parentPath === path)
+      const shape = arrangement.shape
+      const floor = resizeFloor(node, shape, kids, node, detail)
+      if (!floor) return { floor: null, children: kids.length }
+      const at = (f: number) => ({ x: node.x, y: node.y, w: floor.w * f, h: floor.h * f })
+      return {
+        floor,
+        holdsAtFloor: holdsContent(at(1), shape, kids, node, detail),
+        holdsAt90: holdsContent(at(0.9), shape, kids, node, detail),
+        children: kids.length,
+      }
+    }
+    /** Does this Team still hold its content when scaled by `f` from its fixed corner? */
+    w['__holdsAt'] = (path: string, f: number): boolean => {
+      const node = placementWithManual.nodes.find((n) => n.path === path)
+      if (!node) return false
+      const kids = placementWithManual.nodes.filter((n) => n.parentPath === path)
+      return holdsContent({ x: node.x, y: node.y, w: node.w * f, h: node.h * f }, arrangement.shape, kids, node, detail)
+    }
+    /** Same, but scaled about the box CENTRE rather than its fixed top-left corner. */
+    w['__holdsAtCentred'] = (path: string, f: number): boolean => {
+      const node = placementWithManual.nodes.find((n) => n.path === path)
+      if (!node) return false
+      const kids = placementWithManual.nodes.filter((n) => n.parentPath === path)
+      const w2 = node.w * f
+      const h2 = node.h * f
+      const box = { x: node.x + (node.w - w2) / 2, y: node.y + (node.h - h2) / 2, w: w2, h: h2 }
+      return holdsContent(box, arrangement.shape, kids, node, detail)
     }
     w['__loadViewText'] = (text: string): string => {
       try {
@@ -245,7 +311,7 @@ export function Workbench({ org, files, onClose }: { org: Organization; files: F
         return e instanceof Error ? e.message : String(e)
       }
     }
-  }, [placementWithManual, org.name, draft, detail, filter, style])
+  }, [placementWithManual, escaped, org.name, draft, detail, filter, style])
 
   /**
    * Export goes through the file seam, not a bare download link — and it reports
@@ -379,12 +445,12 @@ export function Workbench({ org, files, onClose }: { org: Organization; files: F
         <span data-k="layout">layout {layoutMs.toFixed(1)} ms</span>
         <span data-k="fps">fps {fps ? fps.toFixed(0) : '—'}</span>
         <span data-k="worst">worst {Number.isFinite(worst) ? worst.toFixed(0) : '—'}</span>
-        {/* Anything the viewer should know about what they are looking at (#42). */}
-        {placement.notice && (
-          <span data-k="notice" style={S.warn}>
-            ⚠ {placement.notice}
+        {/* Anything the viewer should know about what they are looking at (#42, #47). */}
+        {notices.map((n) => (
+          <span key={n} data-k="notice" style={S.warn}>
+            ⚠ {n}
           </span>
-        )}
+        ))}
       </div>
 
       <div
