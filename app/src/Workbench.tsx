@@ -12,6 +12,8 @@ import { renderSvgToPng, ExportTooLarge } from './view/png'
 import { DEFAULT_ARRANGEMENT, parseViewDoc, serialise, toViewDoc, viewFileName, viewNameOf, ViewFileError } from './view/viewFile'
 import type { CanvasHandle } from './view/Canvas'
 import { holdsContent, outOfBounds, resizeFloor } from './view/contain'
+import type { SiblingOverlap } from './view/drag'
+import { DEFAULT_SIBLING_OVERLAP, overlappingSiblings } from './view/drag'
 import { DEFAULT_STYLE, writeLayer } from './view/cascade'
 import type { StyleDoc } from './view/cascade'
 import { useFps } from './useFps'
@@ -59,6 +61,14 @@ export function Workbench({ org, files, onClose }: { org: Organization; files: F
   const { fps, worst } = useFps(interacting)
 
   const [detail, setDetail] = useState<DetailSwitches>({ positions: true, occupantNames: true, counts: false })
+  /**
+   * How much the canvas protects siblings from each other while dragging.
+   *
+   * Session state, deliberately not part of the View: a View is a visual
+   * representation, and this changes nothing about how the diagram is drawn — only
+   * what a pointer is allowed to do to it. Loading a view therefore leaves it alone.
+   */
+  const [siblingOverlap, setSiblingOverlap] = useState<SiblingOverlap>(DEFAULT_SIBLING_OVERLAP)
   const [filter, setFilter] = useState<ReadonlySet<string>>(new Set())
   const [railCollapsed, setRailCollapsed] = useState(false)
   const [arrangeCollapsed, setArrangeCollapsed] = useState(false)
@@ -264,6 +274,13 @@ export function Workbench({ org, files, onClose }: { org: Organization; files: F
      * never inside their parent there.
      */
     w['__containmentFailures'] = (): string[] => escaped
+    /**
+     * Every pair of Teams sharing a parent that is drawn on top of the other. Arrange's
+     * output has none under either Shape, which is what makes a non-empty answer here
+     * the mark of a hand drag rather than of the packers.
+     */
+    w['__siblingOverlaps'] = (): [string, string][] =>
+      overlappingSiblings(placementWithManual.nodes, arrangement.shape)
     /** The smallest this Team may be drawn, and whether a candidate size holds (#45). */
     w['__floor'] = (path: string): unknown => {
       const node = placementWithManual.nodes.find((n) => n.path === path)
@@ -471,6 +488,7 @@ export function Workbench({ org, files, onClose }: { org: Organization; files: F
             manual={manualPaths}
             onMove={onMove}
             onResize={onResize}
+            siblingOverlap={siblingOverlap}
           />
         </div>
         <div style={S.railCol}>
@@ -490,9 +508,11 @@ export function Workbench({ org, files, onClose }: { org: Organization; files: F
           style={style}
           detail={detail}
           filter={filter}
+          siblingOverlap={siblingOverlap}
           onPatchLayer={patchLayer}
           onToggleDetail={toggleDetail}
           onFilter={changeFilter}
+          onSiblingOverlap={setSiblingOverlap}
             collapsed={railCollapsed}
             onCollapse={setRailCollapsed}
           />

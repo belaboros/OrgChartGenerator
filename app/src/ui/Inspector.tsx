@@ -3,6 +3,8 @@ import type { PositionStyle, TeamStyle } from '../files/types'
 import type { StyleDoc } from '../view/cascade'
 import { positionLayerChain, resolveTeamStyle, teamLayerChain } from '../view/cascade'
 import type { PlacedTeam, DetailSwitches } from '../view/layout'
+import type { SiblingOverlap } from '../view/drag'
+import { SIBLING_OVERLAPS, SIBLING_OVERLAP_HINT, SIBLING_OVERLAP_LABEL } from '../view/drag'
 import { LayerEditor } from './LayerEditor'
 import { RoleFilter } from './RoleFilter'
 
@@ -21,9 +23,11 @@ export function Inspector({
   style,
   detail,
   filter,
+  siblingOverlap,
   onPatchLayer,
   onToggleDetail,
   onFilter,
+  onSiblingOverlap,
   collapsed,
   onCollapse,
 }: {
@@ -33,13 +37,15 @@ export function Inspector({
   style: StyleDoc
   detail: DetailSwitches
   filter: ReadonlySet<string>
+  siblingOverlap: SiblingOverlap
   onPatchLayer(id: string, patch: Record<string, unknown>): void
   onToggleDetail(k: keyof DetailSwitches): void
   onFilter(next: Set<string>): void
+  onSiblingOverlap(v: SiblingOverlap): void
   collapsed: boolean
   onCollapse(v: boolean): void
 }) {
-  const [tab, setTab] = useState<'selection' | 'layers' | 'view'>('selection')
+  const [tab, setTab] = useState<'selection' | 'layers' | 'view' | 'drag'>('selection')
 
   if (collapsed) {
     return (
@@ -54,7 +60,7 @@ export function Inspector({
   return (
     <aside style={S.rail}>
       <div style={S.tabs}>
-        {(['selection', 'layers', 'view'] as const).map((t) => (
+        {(['selection', 'layers', 'view', 'drag'] as const).map((t) => (
           <button key={t} onClick={() => setTab(t)} style={{ ...S.tab, ...(tab === t ? S.tabOn : {}) }}>
             {t}
           </button>
@@ -149,6 +155,41 @@ export function Inspector({
             <RoleFilter roles={roles} selected={filter} onChange={onFilter} />
           </>
         )}
+
+        {/*
+          How dragging behaves, not what the diagram looks like — which is why it is
+          its own tab and why none of it is written to the view file. A Team may not
+          leave its parent under any of these (#45, #46); what is settled here is
+          what it may do to the Teams BESIDE it.
+        */}
+        {tab === 'drag' && (
+          <>
+            <h4 style={S.h4}>Sibling overlap</h4>
+            <p style={S.hint}>
+              Whether a hand move or resize may put a Team on top of another Team with the same parent.
+              Arrange never does.
+            </p>
+            <select
+              value={siblingOverlap}
+              onChange={(e) => onSiblingOverlap(e.target.value as SiblingOverlap)}
+              style={S.select}
+              data-k="sibling-overlap"
+            >
+              {SIBLING_OVERLAPS.map((o) => (
+                <option key={o} value={o}>
+                  {SIBLING_OVERLAP_LABEL[o]}
+                </option>
+              ))}
+            </select>
+            <p style={S.hint} data-k="sibling-overlap-hint">
+              {SIBLING_OVERLAP_HINT[siblingOverlap]}
+            </p>
+            <p style={S.hint}>
+              A Team that already overlaps a sibling when the drag starts keeps that overlap for the rest
+              of the gesture — otherwise there would be no way to drag it back out.
+            </p>
+          </>
+        )}
       </div>
     </aside>
   )
@@ -239,6 +280,7 @@ const S: Record<string, React.CSSProperties> = {
   provK: { padding: '2px 0', color: 'var(--ink-2)' },
   provV: { padding: '2px 0', textAlign: 'right' },
   check: { display: 'flex', gap: 7, alignItems: 'center', padding: '3px 0', fontSize: 12 },
+  select: { width: '100%', fontSize: 12, padding: '4px 6px', border: '1px solid var(--rule)', borderRadius: 5 },
   layer: { borderBottom: '1px solid #eef1f4' },
   layerHead: { width: '100%', display: 'flex', alignItems: 'center', gap: 7, border: 0, background: 'transparent', padding: '6px 2px', cursor: 'pointer', fontSize: 12, textAlign: 'left' },
   rank: { fontSize: 9, color: 'var(--ink-3)', width: 24, fontVariantNumeric: 'tabular-nums' },

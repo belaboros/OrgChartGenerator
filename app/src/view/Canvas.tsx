@@ -13,6 +13,8 @@ import type { StyleDoc } from './cascade'
 import { resolvePositionStyle, resolveTeamStyle } from './cascade'
 import type { Box } from './contain'
 import { contains, holdsContent } from './contain'
+import type { SiblingOverlap } from './drag'
+import { siblingClashes } from './drag'
 
 export interface CanvasHandle {
   fit(): void
@@ -34,12 +36,27 @@ interface Props {
   onMove(path: string, dx: number, dy: number): void
   /** The full box, because `ellipse` resizes about its centre and so moves x/y (#48). */
   onResize(path: string, box: { x: number; y: number; w: number; h: number }): void
+  /** What a drag may do to the Teams beside it — see `drag.ts` for the three answers. */
+  siblingOverlap: SiblingOverlap
 }
 
+/**
+ * A gesture in progress. `exempt` is the siblings this Team already overlapped when
+ * the pointer went down, frozen for the life of the gesture — see `siblingClashes`.
+ */
 type Drag =
   | { kind: 'pan'; sx: number; sy: number }
-  | { kind: 'move'; path: string; ox: number; oy: number; dx: number; dy: number }
-  | { kind: 'resize'; path: string; x: number; y: number; w: number; h: number; box: Box }
+  | { kind: 'move'; path: string; ox: number; oy: number; dx: number; dy: number; exempt: ReadonlySet<string> }
+  | {
+      kind: 'resize'
+      path: string
+      x: number
+      y: number
+      w: number
+      h: number
+      box: Box
+      exempt: ReadonlySet<string>
+    }
 
 interface Transform {
   x: number
@@ -47,8 +64,11 @@ interface Transform {
   k: number
 }
 
+/** One empty array, so "nothing clashes" is the same value every time. */
+const NONE: readonly string[] = []
+
 export const Canvas = forwardRef<CanvasHandle, Props>(function Canvas(
-  { placement, style, shape, detail, selected, onSelect, manual, onMove, onResize },
+  { placement, style, shape, detail, selected, onSelect, manual, onMove, onResize, siblingOverlap },
   ref,
 ) {
   const svgRef = useRef<SVGSVGElement | null>(null)
@@ -58,16 +78,31 @@ export const Canvas = forwardRef<CanvasHandle, Props>(function Canvas(
   const [preview, setPreview] = useState<{ paths: Set<string>; dx: number; dy: number } | null>(null)
   const [sizing, setSizing] = useState<{ path: string; x: number; y: number; w: number; h: number } | null>(null)
   /**
-   * The boundary that stopped a drag (#46). Hitting a limit ENDS the gesture, so
-   * without a mark the shape would simply stop following the pointer and the whole
-   * thing would read as a dropped drag rather than as protection.
+   * The boundary currently holding a drag back.
+   *
+   * The gesture does NOT end at the limit: the shape stops at the boundary while the
+   * pointer carries on, and picks the shape back up the moment the pointer returns to
+   * somewhere legal. So this is live state for as long as the drag is pressed against
+   * something, not a mark left behind by a stop.
    */
-  const [stoppedBy, setStoppedBy] = useState<string | null>(null)
+  const [blockedBy, setBlockedBy] = useState<string | null>(null)
+  /**
+   * Siblings the dragged Team is sitting on top of right now, under
+   * `only-during-drag` — where the overlap is allowed but will not survive release.
+   * Marking them is what keeps the snap-back from arriving as a surprise.
+   */
+  const [clashing, setClashing] = useState<readonly string[]>(NONE)
+  /**
+   * The Team a release just sent back where it came from. The snap-back itself is
+   * instantaneous and therefore invisible; this says which shape moved and why, and
+   * clears itself shortly after.
+   */
+  const [reverted, setReverted] = useState<{ path: string; at: number } | null>(null)
   useEffect(() => {
-    if (!stoppedBy) return
-    const id = setTimeout(() => setStoppedBy(null), 1400)
+    if (!reverted) return
+    const id = setTimeout(() => setReverted(null), 1600)
     return () => clearTimeout(id)
-  }, [stoppedBy])
+  }, [reverted])
 
   const toWorld = useCallback(
     (e: { clientX: number; clientY: number }): { x: number; y: number } => {
@@ -101,36 +136,55 @@ export const Canvas = forwardRef<CanvasHandle, Props>(function Canvas(
   )
 
   /**
-   * Nesting protection (#46). A move is legal when the dragged Team is still inside
+   * What stops this box, as the path of the shape doing the stopping — `null` when
+   * nothing does. Naming the obstacle rather than returning a bare `false` is what
+   * lets the canvas mark the thing the drag is pressed against, which under the
+   * sibling policy is no longer always the parent.
+   *
+   * Nesting protection (#46): a move is legal when the dragged Team is still inside
    * its parent's Shape — the subtree translates rigidly, so only the dragged Team
-   * need be tested. A resize is legal when it is inside its parent AND still holds
-   * its own children and labels.
+   * need be tested. A resize must also still hold its own children and labels, and
+   * there the obstacle is the Team's own contents, so it names itself.
    *
    * The organization has no parent, so nothing contains it.
    */
-  const legal = useCallback(
-    (path: string, box: { x: number; y: number; w: number; h: number }, checkContent: boolean): boolean => {
+  const blocker = useCallback(
+    (path: string, box: Box, checkContent: boolean, exempt: ReadonlySet<string>): string | null => {
       const n = nodeOf(path)
-      if (!n) return false
+      if (!n) return path
       const parent = n.parentPath ? nodeOf(n.parentPath) : undefined
-      if (parent && !contains(parent, shape, box)) return false
-      if (!checkContent) return true
-      const kids = placement.nodes.filter((m) => m.parentPath === path)
-      return holdsContent(box, shape, kids, n, detail)
+      if (parent && !contains(parent, shape, box)) return parent.path
+      if (checkContent) {
+        const kids = placement.nodes.filter((m) => m.parentPath === path)
+        if (!holdsContent(box, shape, kids, n, detail)) return path
+      }
+      // A sibling is a wall under `not-enabled` only. The other two policies let the
+      // pointer through and differ in what RELEASE does about the overlap.
+      if (siblingOverlap === 'not-enabled') {
+        return siblingClashes(placement.nodes, path, box, shape, exempt)[0] ?? null
+      }
+      return null
     },
-    [nodeOf, placement, shape, detail],
+    [nodeOf, placement, shape, detail, siblingOverlap],
   )
 
-  /** Commit whatever was last legal and end the gesture — the pointer keeps going. */
-  const stopDrag = useCallback((e: React.PointerEvent<SVGSVGElement>, blockedBy: string | null) => {
-    const d = drag.current
-    drag.current = null
-    setPreview(null)
-    setSizing(null)
-    if (svgRef.current?.hasPointerCapture(e.pointerId)) svgRef.current.releasePointerCapture(e.pointerId)
-    setStoppedBy(blockedBy)
-    return d
-  }, [])
+  /**
+   * The siblings this box lands on, under the one policy that has anything to say
+   * about them at release: empty for the other two, which is what makes the check on
+   * pointer-up a no-op there rather than a special case. Never stops a drag.
+   */
+  const clashesAt = useCallback(
+    (path: string, box: Box, exempt: ReadonlySet<string>): readonly string[] =>
+      siblingOverlap === 'only-during-drag' ? siblingClashes(placement.nodes, path, box, shape, exempt) : NONE,
+    [placement, shape, siblingOverlap],
+  )
+
+  /** The siblings a Team already sits on, frozen when a gesture starts. */
+  const exemptAt = useCallback(
+    (n: PlacedTeam): ReadonlySet<string> =>
+      new Set(siblingClashes(placement.nodes, n.path, { x: n.x, y: n.y, w: n.w, h: n.h }, shape)),
+    [placement, shape],
+  )
 
   const onWheel = useCallback((e: React.WheelEvent<SVGSVGElement>) => {
     const el = svgRef.current
@@ -169,35 +223,69 @@ export const Canvas = forwardRef<CanvasHandle, Props>(function Canvas(
         const n = nodeOf(d.path)
         if (!n) return
 
+        /*
+         * Clamped, not cancelled. Each axis is tried on its own after the pair fails,
+         * so a drag into a corner SLIDES along the wall instead of sticking: without
+         * that, pushing diagonally against an edge freezes the shape completely and
+         * the protection feels like a seized control rather than a wall.
+         *
+         * Nothing here ends the gesture. The pointer may leave the parent entirely and
+         * the shape simply waits at the boundary; bring it back and the shape follows
+         * again from wherever the pointer now is.
+         */
         if (d.kind === 'move') {
           const dx = world.x - d.ox
           const dy = world.y - d.oy
-          if (!legal(d.path, { x: n.x + dx, y: n.y + dy, w: n.w, h: n.h }, false)) {
-            // Crossed the boundary: keep the last legal offsets and end the gesture.
-            const done = stopDrag(e, n.parentPath)
-            if (done && done.kind === 'move' && (done.dx !== 0 || done.dy !== 0)) onMove(done.path, done.dx, done.dy)
-            return
+          const boxAt = (ax: number, ay: number): Box => ({ x: n.x + ax, y: n.y + ay, w: n.w, h: n.h })
+          const stops = (ax: number, ay: number): string | null =>
+            blocker(d.path, boxAt(ax, ay), false, d.exempt)
+
+          let nx = d.dx
+          let ny = d.dy
+          const hit = stops(dx, dy)
+          if (!hit) {
+            nx = dx
+            ny = dy
+          } else if (!stops(dx, d.dy)) {
+            nx = dx
+          } else if (!stops(d.dx, dy)) {
+            ny = dy
           }
-          d.dx = dx
-          d.dy = dy
-          setPreview({ paths: subtreeOf(placement, d.path), dx, dy })
+
+          d.dx = nx
+          d.dy = ny
+          setBlockedBy(nx !== dx || ny !== dy ? hit : null)
+          setClashing(clashesAt(d.path, boxAt(nx, ny), d.exempt))
+          setPreview({ paths: subtreeOf(placement, d.path), dx: nx, dy: ny })
         } else {
           // `ellipse` grows about its centre (#48); `rectangle` from its fixed corner.
           const w = Math.max(20, world.x - d.x)
           const h = Math.max(20, world.y - d.y)
-          const box =
+          const boxFor = (bw: number, bh: number): Box =>
             shape === 'ellipse'
-              ? { x: n.x + (n.w - w) / 2, y: n.y + (n.h - h) / 2, w, h }
-              : { x: d.x, y: d.y, w, h }
-          if (!legal(d.path, box, true)) {
-            const done = stopDrag(e, n.parentPath ?? d.path)
-            if (done && done.kind === 'resize') onResize(done.path, done.box)
-            return
+              ? { x: n.x + (n.w - bw) / 2, y: n.y + (n.h - bh) / 2, w: bw, h: bh }
+              : { x: d.x, y: d.y, w: bw, h: bh }
+          const stops = (bw: number, bh: number): string | null =>
+            blocker(d.path, boxFor(bw, bh), true, d.exempt)
+
+          let nw = d.w
+          let nh = d.h
+          const hit = stops(w, h)
+          if (!hit) {
+            nw = w
+            nh = h
+          } else if (!stops(w, d.h)) {
+            nw = w
+          } else if (!stops(d.w, h)) {
+            nh = h
           }
-          d.w = w
-          d.h = h
-          d.box = box
-          setSizing({ path: d.path, ...box })
+
+          d.w = nw
+          d.h = nh
+          d.box = boxFor(nw, nh)
+          setBlockedBy(nw !== w || nh !== h ? hit : null)
+          setClashing(clashesAt(d.path, d.box, d.exempt))
+          setSizing({ path: d.path, ...d.box })
         }
       }}
       onPointerUp={(e) => {
@@ -205,8 +293,26 @@ export const Canvas = forwardRef<CanvasHandle, Props>(function Canvas(
         drag.current = null
         setPreview(null)
         setSizing(null)
+        setBlockedBy(null)
+        setClashing(NONE)
         if (svgRef.current?.hasPointerCapture(e.pointerId)) svgRef.current.releasePointerCapture(e.pointerId)
         if (!d || d.kind === 'pan') return
+        const n = nodeOf(d.path)
+        if (!n) return
+
+        /*
+         * `only-during-drag` refuses at RELEASE, and refuses the gesture WHOLE: the
+         * Team keeps the position and size it had when the pointer went down. The
+         * alternative — committing as far along as was clash-free — would leave it
+         * somewhere neither the user nor Arrange ever chose, which is the outcome
+         * this policy exists to avoid.
+         */
+        const landed = d.kind === 'move' ? { x: n.x + d.dx, y: n.y + d.dy, w: n.w, h: n.h } : d.box
+        if (clashesAt(d.path, landed, d.exempt).length > 0) {
+          setReverted({ path: d.path, at: Date.now() })
+          return
+        }
+
         if (d.kind === 'move') {
           if (d.dx !== 0 || d.dy !== 0) onMove(d.path, d.dx, d.dy)
         } else {
@@ -246,36 +352,85 @@ export const Canvas = forwardRef<CanvasHandle, Props>(function Canvas(
               onStartMove={(path, e) => {
                 if (e.altKey) return // alt-drag pans, even over a shape
                 const w = toWorld(e)
-                drag.current = { kind: 'move', path, ox: w.x, oy: w.y, dx: 0, dy: 0 }
+                drag.current = { kind: 'move', path, ox: w.x, oy: w.y, dx: 0, dy: 0, exempt: exemptAt(n) }
                 svgRef.current?.setPointerCapture(e.pointerId)
               }}
               onStartResize={(path, e) => {
-                drag.current = { kind: 'resize', path, x: n.x, y: n.y, w: n.w, h: n.h, box: { x: n.x, y: n.y, w: n.w, h: n.h } }
+                drag.current = {
+                  kind: 'resize',
+                  path,
+                  x: n.x,
+                  y: n.y,
+                  w: n.w,
+                  h: n.h,
+                  box: { x: n.x, y: n.y, w: n.w, h: n.h },
+                  exempt: exemptAt(n),
+                }
                 svgRef.current?.setPointerCapture(e.pointerId)
               }}
             />
           )
         })}
         {/*
-          The boundary that stopped a drag (#46). The gesture ends rather than
-          clamping, so without this the shape just stops following the pointer and
-          the whole thing reads as a dropped drag rather than as protection.
+          The boundary currently holding the drag back. Shown only while the shape
+          is actually pressed against it, so it reads as a wall rather than as the
+          drag having died. Under `not-enabled` the wall can be a SIBLING, which is
+          why this traces whatever `blocker` named rather than always the parent.
         */}
-        {stoppedBy &&
+        {blockedBy &&
           (() => {
-            const p = placement.nodes.find((n) => n.path === stoppedBy)
-            if (!p) return null
-            const common = { fill: 'none', stroke: '#c0392b', strokeWidth: 3, pointerEvents: 'none' as const }
-            return shape === 'ellipse' ? (
-              <ellipse data-k="stopped" cx={p.x + p.w / 2} cy={p.y + p.h / 2} rx={p.w / 2} ry={p.h / 2} {...common} />
-            ) : (
-              <rect data-k="stopped" x={p.x} y={p.y} width={p.w} height={p.h} rx={4} {...common} />
-            )
+            const p = placement.nodes.find((n) => n.path === blockedBy)
+            return p ? <Outline box={p} shape={shape} colour="#c0392b" mark="stopped" /> : null
+          })()}
+        {/*
+          Siblings the Team is currently on top of, under `only-during-drag`. The
+          overlap is legal right now and will not survive release, and a mark is the
+          only warning there is — otherwise the snap-back looks like a lost drag.
+        */}
+        {clashing.map((path) => {
+          const p = placement.nodes.find((n) => n.path === path)
+          return p ? <Outline key={`c:${path}`} box={p} shape={shape} colour="#a3600a" dashed mark="clash" /> : null
+        })}
+        {/* Where the Team went back to, and the only sign it went anywhere at all. */}
+        {reverted &&
+          (() => {
+            const p = placement.nodes.find((n) => n.path === reverted.path)
+            return p ? <Outline box={p} shape={shape} colour="#a3600a" mark="reverted" /> : null
           })()}
       </g>
     </svg>
   )
 })
+
+/** One shape traced where it stands — how the canvas points at something. */
+function Outline({
+  box,
+  shape,
+  colour,
+  dashed,
+  mark,
+}: {
+  box: Box
+  shape: ShapeKind
+  colour: string
+  dashed?: boolean
+  mark: string
+}) {
+  const common = {
+    fill: 'none',
+    stroke: colour,
+    strokeWidth: 3,
+    pointerEvents: 'none' as const,
+    'data-export-hide': '',
+    'data-k': mark,
+    ...(dashed ? { strokeDasharray: '7 4' } : {}),
+  }
+  return shape === 'ellipse' ? (
+    <ellipse cx={box.x + box.w / 2} cy={box.y + box.h / 2} rx={box.w / 2} ry={box.h / 2} {...common} />
+  ) : (
+    <rect x={box.x} y={box.y} width={box.w} height={box.h} rx={4} {...common} />
+  )
+}
 
 /** Containment edges. Only drawn for `tree`; in `nested` a parent already contains its children. */
 function Edge({ node, nodes }: { node: PlacedTeam; nodes: PlacedTeam[] }) {

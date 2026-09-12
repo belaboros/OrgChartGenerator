@@ -176,3 +176,71 @@ export function outOfBounds(
     })
     .map((n) => n.path)
 }
+
+/**
+ * Do two sibling Shapes overlap?
+ *
+ * Siblings are compared as they are DRAWN, which is why this cannot be a box test
+ * under `ellipse`: the chord packer lays a row flush across the widest chord it
+ * fits in, so the BOXES of two ellipses in one row routinely overlap while the
+ * ellipses themselves have visible space between them. A box test would report
+ * those as clashes and hold a drag against a wall the user cannot see.
+ *
+ * The tolerance is the same `EPS` the containment tests use, for the same reason: a
+ * saved view rounds every coordinate to a whole unit, so shapes Arrange left with a
+ * clean `GAP` between them can come back appearing to bite into each other. Below
+ * that, this reports no overlap.
+ */
+export function overlaps(a: Box, b: Box, shape: ShapeKind): boolean {
+  if (shape === 'rectangle') {
+    return (
+      Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x) > EPS &&
+      Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y) > EPS
+    )
+  }
+
+  // Both Shapes shrink by half the tolerance, so a pair that bites in by less than
+  // EPS in total still counts as clear — the rectangle branch's rule, restated for
+  // radii.
+  const ax = a.w / 2 - EPS / 2
+  const ay = a.h / 2 - EPS / 2
+  const bx = b.w / 2 - EPS / 2
+  const by = b.h / 2 - EPS / 2
+  if (ax <= 0 || ay <= 0 || bx <= 0 || by <= 0) return false
+
+  /*
+   * Scale the plane by `a`'s radii. `a` becomes the unit circle and `b` stays an
+   * axis-aligned ellipse — anisotropic scaling along the axes cannot tilt it — so
+   * the question reduces to whether `b` comes within 1 of the origin. Both signs
+   * fold away, because an axis-aligned ellipse is symmetric about both axes.
+   */
+  const cx = Math.abs(b.x + b.w / 2 - (a.x + a.w / 2)) / ax
+  const cy = Math.abs(b.y + b.h / 2 - (a.y + a.h / 2)) / ay
+  return distanceToEllipse(cx, cy, bx / ax, by / ay) <= 1
+}
+
+/**
+ * Distance from a point in the first quadrant to an axis-aligned ellipse centred on
+ * the origin; 0 when the point is inside it.
+ *
+ * Bisected on the parametric angle rather than solved: the closed form is a quartic
+ * root, while the squared distance's derivative is `<= 0` at `t = 0` and `>= 0` at
+ * `t = PI/2` for every point in the quadrant, so the nearest point is the one sign
+ * change between them. 40 halvings put the answer far below the `EPS` it is
+ * compared against, and this runs over a Team's siblings, not the whole diagram.
+ */
+function distanceToEllipse(px: number, py: number, rx: number, ry: number): number {
+  if ((px / rx) ** 2 + (py / ry) ** 2 <= 1) return 0
+  let lo = 0
+  let hi = Math.PI / 2
+  for (let i = 0; i < 40; i++) {
+    const t = (lo + hi) / 2
+    const c = Math.cos(t)
+    const s = Math.sin(t)
+    // Half the derivative of the squared distance at `t`.
+    if ((ry * ry - rx * rx) * s * c + px * rx * s - py * ry * c < 0) lo = t
+    else hi = t
+  }
+  const t = (lo + hi) / 2
+  return Math.hypot(rx * Math.cos(t) - px, ry * Math.sin(t) - py)
+}
